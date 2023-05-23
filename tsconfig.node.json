@@ -1,0 +1,20 @@
+// 打包环境的配置
+/* 修改JS配置文件的时候在这里配置，不要在tsconfig.json里面配置 */
+{
+  "extends": "@vue/tsconfig/tsconfig.node.json",
+  "include": [
+    "vite.config.*",
+    "vitest.config.*",
+    "cypress.config.*",
+    "playwright.config.*"
+  ],
+  "compilerOptions": {
+    // 合成到tsconfig.json的选项
+    "composite": true,
+    // 会在Node环境下基于ts进行编译
+    // 对element-plus的API推导产生效果
+    "types": ["node", "element-plus/global"],
+    // "verbatimModuleSyntax": true,
+    "ignoreDeprecations": "5.0"
+  }
+}

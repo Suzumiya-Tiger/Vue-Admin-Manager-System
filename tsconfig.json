@@ -1,0 +1,29 @@
+// 开发环境的配置
+{
+  // 继承了公共的默认配置
+  "extends": "@vue/tsconfig/tsconfig.web.json",
+  // env.d.ts 类型声明,src下的vue文件和其他文件 都要进行编译
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "auto-imports.d.ts",
+    "components.d.ts"
+  ],
+  //
+  "compilerOptions": {
+    "ignoreDeprecations": "5.0",
+    "baseUrl": ".",
+    /* 代码的提示作用(特别是import的时候) */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noImplicitAny": true
+  },
+
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
