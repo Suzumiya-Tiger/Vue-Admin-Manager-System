@@ -15,6 +15,7 @@
             <el-icon style="cursor:pointer" @click="translateShow">
               <Hide />
             </el-icon>
+            测试
           </template>
         </el-input>
       </el-form-item>
