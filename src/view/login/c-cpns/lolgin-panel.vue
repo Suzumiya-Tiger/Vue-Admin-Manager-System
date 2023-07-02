@@ -3,7 +3,7 @@
     <h1 class="title">后台管理系统</h1>
     <div class="tabs">
       <el-tabs type="border-card" stretch v-model="activeName">
-        <el-tab-pane label="账号登录" name="account">
+        <el-tab-pane label="帐号登录" name="account">
           <template #label>
             <div class="label">
               <el-icon>
@@ -13,7 +13,7 @@
             </div>
           </template>
 
-          <pane-account></pane-account>
+          <pane-account ref="accountRef"></pane-account>
         </el-tab-pane>
         <el-tab-pane label="手机登录" name="phone">
           <template #label>
@@ -42,10 +42,19 @@ import { ref } from 'vue'
 import PaneAccount from './panel-account.vue'
 import PanePhone from './panel-phone.vue'
 const isRemPwd = ref(false)
+/*
+typeof PaneAccount 所拿到的是一个构造器，InstanceType要求获取的是一个构造器
+*/
+const accountRef = ref<InstanceType<typeof PaneAccount>>()
 const activeName = ref('account')
+
 function handleLoginBtnClick() {
   if (activeName.value === 'account') {
-    console.log('账号登录')
+    // 1.获取子组件的实例
+    console.log(accountRef.value);
+    // 这里需要用可选链
+    accountRef.value?.loginAction()
+    // 2.调用方法
   } else {
     console.log('手机登录')
   }

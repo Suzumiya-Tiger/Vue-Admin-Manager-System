@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <login-panel />
-   </div>
+  </div>
 </template>
 
 <script setup lang="ts">
