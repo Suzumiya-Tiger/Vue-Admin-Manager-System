@@ -27,11 +27,17 @@
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormRules, ElForm } from 'element-plus'
+import useLoginStore from '@/store/login/login'
+// 导入业务页面需要的类型
+import type { IAccount } from '@/types'
 const labelPosition = ref('right')
-const account = reactive({
+// 1.定义account数据
+const account = reactive<IAccount>({
   name: '',
   password: ''
 })
+// 引入login的pinia状态(激活该实例使其内部方法可以被调用)
+const loginStore = useLoginStore()
 const showPassword = ref(true)
 // 2.定义校验规则
 const accountRules: FormRules = {
@@ -40,7 +46,7 @@ const accountRules: FormRules = {
     { required: true, message: '必须输入帐号信息~', trigger: 'blur' },
     { pattern: /^[a-z0-9]{6,20}$/, message: '必须6~20位数字/字母组成', trigger: 'blur' }
   ],
-  passwords: [
+  password: [
     { required: true, message: '必须输入密码信息', trigger: 'blur' },
     { pattern: /^[a-z0-9]{6,20}$/, message: '必须是6位以上的数字/字母组成', trigger: 'blur' }
   ]
@@ -50,11 +56,17 @@ function translateShow() {
 
 }
 // 3.执行帐号的登录逻辑
+// InstanceType<typeof ElForm> 获取实例构造器(typeof ElForm)的实例类型(即返回的实例)
 const formRef = ref<InstanceType<typeof ElForm>>()
 function loginAction() {
   formRef.value?.validate((valid) => {
     if (valid) {
-      console.log('first');
+      // 1.获取用户输入的账号和密码
+      const name = account.name;
+      const password = account.password
+      // 2.向服务器发送网络请求(携带账号和密码)
+      // 调用其action的内部方法
+      loginStore.loginAccountAction({ name, password })
     } else {
       ElMessage.error('请输入正确的格式后再操作')
     }

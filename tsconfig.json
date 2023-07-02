@@ -14,13 +14,14 @@
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
     "baseUrl": ".",
-    /* 代码的提示作用(特别是import的时候) */
+    /* 引入某个文件时的快捷路径标识(特别是import的时候) */
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "noImplicitAny": true
   },
-
   "references": [
     {
       "path": "./tsconfig.node.json"

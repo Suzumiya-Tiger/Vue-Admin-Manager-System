@@ -50,9 +50,9 @@ const activeName = ref('account')
 
 function handleLoginBtnClick() {
   if (activeName.value === 'account') {
-    // 1.获取子组件的实例
+    // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
     console.log(accountRef.value);
-    // 这里需要用可选链
+    // 这里需要用可选链，因为不能保证后续的函数一定存在
     accountRef.value?.loginAction()
     // 2.调用方法
   } else {
