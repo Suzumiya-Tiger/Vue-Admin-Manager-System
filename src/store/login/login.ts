@@ -3,7 +3,9 @@ import { accountLoginRequest } from '@/service/login/login'
 
 import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'
-const LOGIN_TOKEN = 'login/token'
+
+import router from '@/router'
+import { LOGIN_TOKEN } from '@/global/constants'
 const useLoginStore = defineStore('login', {
   state: () => ({
     id: '',
@@ -22,6 +24,9 @@ const useLoginStore = defineStore('login', {
       // 2.进行本地缓存
       // 以LOGIN_TOKEN的键名存入token
       localCache.setCache(LOGIN_TOKEN, this.token)
+
+      // 3.页面跳转(main页面)
+      router.push('/main')
     }
   }
 })

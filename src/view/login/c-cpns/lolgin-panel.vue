@@ -38,10 +38,16 @@
 
 <script setup lang="ts">
 // import type { Cellphone } from '@element-plus/icons-vue/dist/types'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
 import PanePhone from './panel-phone.vue'
-const isRemPwd = ref(false)
+import { localCache } from '@/utils/cache'
+
+
+const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false )
+watch(isRemPwd, (newVal) => {
+  localCache.setCache('isRemPwd', newVal)
+})
 /*
 typeof PaneAccount 所拿到的是一个构造器，InstanceType要求获取的是一个构造器
 */
@@ -53,7 +59,11 @@ function handleLoginBtnClick() {
     // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
     console.log(accountRef.value);
     // 这里需要用可选链，因为不能保证后续的函数一定存在
-    accountRef.value?.loginAction()
+    accountRef.value?.loginAction(isRemPwd.value)
+    if (isRemPwd.value) {
+      console.log('记住密码');
+
+    }
     // 2.调用方法
   } else {
     console.log('手机登录')

@@ -6,7 +6,7 @@
         <el-input v-model="account.name"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
-        <el-input :type="showPassword ? 'password' : ''" v-model="account.password">
+        <el-input :type="showPassword ? CACHE_PASSWORD : ''" v-model="account.password">
           <template #suffix v-if="showPassword">
             <el-icon style="cursor:pointer" @click="translateShow">
               <View />
@@ -30,11 +30,16 @@ import type { FormRules, ElForm } from 'element-plus'
 import useLoginStore from '@/store/login/login'
 // 导入业务页面需要的类型
 import type { IAccount } from '@/types'
+import { localCache } from '@/utils/cache'
+
+const CACHE_NAME = 'name'
+const CACHE_PASSWORD = 'password'
+
 const labelPosition = ref('right')
 // 1.定义account数据
 const account = reactive<IAccount>({
-  name: '',
-  password: ''
+  name: localCache.getCache(CACHE_NAME) ?? '',
+  password: localCache.getCache(CACHE_PASSWORD) ?? ''
 })
 // 引入login的pinia状态(激活该实例使其内部方法可以被调用)
 const loginStore = useLoginStore()
@@ -58,7 +63,7 @@ function translateShow() {
 // 3.执行帐号的登录逻辑
 // InstanceType<typeof ElForm> 获取实例构造器(typeof ElForm)的实例类型(即返回的实例)
 const formRef = ref<InstanceType<typeof ElForm>>()
-function loginAction() {
+function loginAction(isRemPwd: Boolean) {
   formRef.value?.validate((valid) => {
     if (valid) {
       // 1.获取用户输入的账号和密码
@@ -66,7 +71,17 @@ function loginAction() {
       const password = account.password
       // 2.向服务器发送网络请求(携带账号和密码)
       // 调用其action的内部方法
-      loginStore.loginAccountAction({ name, password })
+      loginStore.loginAccountAction({ name, password }).then(() => {
+        // 3.判断要不要记住密码
+        if (isRemPwd) {
+          localCache.setCache(CACHE_NAME, name)
+          localCache.setCache(CACHE_PASSWORD, password)
+        } else {
+          localCache.removeCache(CACHE_NAME)
+          localCache.removeCache(CACHE_PASSWORD)
+
+        }
+      })
     } else {
       ElMessage.error('请输入正确的格式后再操作')
     }
