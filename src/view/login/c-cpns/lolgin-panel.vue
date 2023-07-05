@@ -1,6 +1,6 @@
 <template>
   <div class="login-panel">
-    <h1 class="title">后台管理系统</h1>
+    <h1 class="title">春日后台管理系统</h1>
     <div class="tabs">
       <el-tabs type="border-card" stretch v-model="activeName">
         <el-tab-pane label="帐号登录" name="account">
@@ -44,7 +44,7 @@ import PanePhone from './panel-phone.vue'
 import { localCache } from '@/utils/cache'
 
 
-const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false )
+const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
 watch(isRemPwd, (newVal) => {
   localCache.setCache('isRemPwd', newVal)
 })
@@ -57,16 +57,13 @@ const activeName = ref('account')
 function handleLoginBtnClick() {
   if (activeName.value === 'account') {
     // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
-    console.log(accountRef.value);
     // 这里需要用可选链，因为不能保证后续的函数一定存在
     accountRef.value?.loginAction(isRemPwd.value)
     if (isRemPwd.value) {
-      console.log('记住密码');
 
     }
     // 2.调用方法
   } else {
-    console.log('手机登录')
   }
 }
 </script>
