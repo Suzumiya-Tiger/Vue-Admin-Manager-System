@@ -32,7 +32,8 @@
       <el-checkbox v-model="isRemPwd" label="记住密码" size="large" />
       <el-link type="primary">忘记密码</el-link>
     </div>
-    <el-button type="primary" class="login-btn" size="large" @click="handleLoginBtnClick">立即登录</el-button>
+    <el-button :loading="btnLoading" type="primary" class="login-btn" size="large"
+      @click="handleLoginBtnClick">立即登录</el-button>
   </div>
 </template>
 
@@ -43,7 +44,7 @@ import PaneAccount from './panel-account.vue'
 import PanePhone from './panel-phone.vue'
 import { localCache } from '@/utils/cache'
 
-
+const btnLoading = ref(false)
 const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
 watch(isRemPwd, (newVal) => {
   localCache.setCache('isRemPwd', newVal)
@@ -55,15 +56,12 @@ const accountRef = ref<InstanceType<typeof PaneAccount>>()
 const activeName = ref('account')
 
 function handleLoginBtnClick() {
+  btnLoading.value = true
   if (activeName.value === 'account') {
     // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
     // 这里需要用可选链，因为不能保证后续的函数一定存在
-    accountRef.value?.loginAction(isRemPwd.value)
-    if (isRemPwd.value) {
-
-    }
-    // 2.调用方法
-  } else {
+    const res = accountRef.value?.loginAction(isRemPwd.value)
+    btnLoading.value = false
   }
 }
 </script>
