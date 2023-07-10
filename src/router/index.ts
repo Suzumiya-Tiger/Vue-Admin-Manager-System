@@ -16,15 +16,35 @@ const router = createRouter({
     },
     {
       path: '/login',
-      component: () => import('../view/login/Login.vue')
+      component: () => import('../views/login/Login.vue')
     },
     {
       path: '/main',
-      component: () => import('../view/main/Main.vue')
+      component: () => import('../views/main/main.vue'),
+      children: [
+        {
+          path: '/main/analysis/overview',
+          component: () =>
+            import('../views/main/analysis/overview/overview.vue')
+        },
+        {
+          path: '/main/analysis/dashboard',
+          component: () =>
+            import('../views/main/analysis/dashboard/dashboard.vue')
+        },
+        {
+          path: '/main/system/user',
+          component: () => import('../views/main/system/user/user.vue')
+        },
+        {
+          path: '/main/system/role',
+          component: () => import('../views/main/system/role/role.vue')
+        }
+      ]
     },
     {
       path: '/:pathMatch(.*)',
-      component: () => import('../view/not-found/NotFound.vue')
+      component: () => import('../views/not-found/NotFound.vue')
     }
   ]
 })
@@ -35,7 +55,7 @@ const router = createRouter({
 router.beforeEach((to, from) => {
   const token = localCache.getCache(LOGIN_TOKEN)
 
-  if (to.path === '/main' && !token) {
+  if (to.path.startsWith('/main') && !token) {
     // 只有拥有token，才能正常进入main
     return '/login'
   }
