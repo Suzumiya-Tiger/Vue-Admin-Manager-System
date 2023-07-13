@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import useLoginStore from '@/store/login/login';
 import { useRouter, useRoute } from 'vue-router';
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, computed } from 'vue';
 import { mapPathToMenu } from '@/utils/map-menus';
 // 0 接收props
 defineProps({
@@ -64,8 +64,12 @@ function handleItemClick(item: any) {
 // 获取当前路由
 const route = useRoute()
 // 匹配当前路由获取对应的id
-const pathMenu = mapPathToMenu(route.path, userMenus)
-const defaultActive = ref(pathMenu.id + '')
+const defaultActive = computed(() => {
+  // 触发computed的关键在于pathMenu的值会根据route.path的变化而变化
+  const pathMenu = mapPathToMenu(route.path, userMenus)
+  return pathMenu.id + ''
+})
+
 </script>
 
 <style lang="less" scoped>

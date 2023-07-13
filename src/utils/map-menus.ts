@@ -37,7 +37,17 @@ export function mapMenusToRoutes(userMenus: any[]) {
     for (const submenu of menu.children) {
       const route = localRoutes.find((route) => route.path === submenu.url)
       // 有可能不存在，所以需要判断
-      if (route) routes.push(route)
+      if (route) {
+        // 给顶层的菜单(可以理解为一级面包屑)添加重定向功能，但是只需要执行第一次即可
+        // 所以需要再添加下文的判断，即只有当routes中不存在menu.url时，才添加重定向功能
+        // 简而言之，就是给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
+        if (!routes.find((item) => item.path === menu.url)) {
+          // 下文的作用是为了点击一级面包屑时，跳转到二级面包屑的第一个路由
+          routes.push({ path: menu.url, redirect: route.path })
+        }
+        // 将二级菜单对应的路由添加到路由映射表中
+        routes.push(route)
+      }
       // 记录第一个被匹配到的路由映射对象，即从后端获取的路由映射表列表中选取第一个路由映射表
       if (!firstMenu && route) firstMenu = submenu
     }
@@ -59,4 +69,25 @@ export function mapPathToMenu(path: string, userMenus: any[]) {
       }
     }
   }
+}
+interface IBreadcrumbs {
+  name: string
+  path?: string
+}
+// 需要两个传参：当前的路由地址，和后端返回的所有的路由映射菜单
+export function mapPathToBreadcrumbs(path: string, userMenus: any[]) {
+  const breadcrumbs: IBreadcrumbs[] = []
+  // 遍历面包屑获取对应层级
+  for (const menu of userMenus) {
+    for (const submenu of menu.children) {
+      // 寻找传入path的路由映射,将其层级的信息添加到面包屑中
+      if (submenu.url === path) {
+        // 一级面包屑
+        breadcrumbs.push({ name: menu.name, path: menu.url })
+        // 二级面包屑
+        breadcrumbs.push({ name: submenu.name, path: submenu.url })
+      }
+    }
+  }
+  return breadcrumbs
 }
