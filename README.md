@@ -1,6 +1,7 @@
 # vue3-ts-cms
 
 This template should help get you started developing with Vue 3 in Vite.
+一个手摸手教你如何一步步建立基于vue3、typescript、pinia的后台管理系统
 
 ## Recommended IDE Setup
 
