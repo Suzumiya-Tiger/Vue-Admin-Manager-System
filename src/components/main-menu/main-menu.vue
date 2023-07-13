@@ -7,9 +7,9 @@
     </div>
     <div class="menu">
       <!-- menu -->
-      <el-menu :collapse-transition="false" default-active="2" :collapse="isFold" text-color="#b7bdc3"
+      <el-menu :collapse-transition="false" :default-active="defaultActive" :collapse="isFold" text-color="#b7bdc3"
         active-text-color="#fff" background-color="#001529">
-        <!-- 通过遍历后端传输数据的方式遍历整个菜单 -->
+        <!-- 通过遍历后端传输数据的方式遍历整个路由映射表 -->
         <template v-for=" item  in  userMenus " :key="item.id">
           <!-- 通过index标识来使得展开收缩只使对应模块起效果 -->
           <el-sub-menu :index="item.id + ''">
@@ -38,8 +38,9 @@
 
 <script setup lang="ts">
 import useLoginStore from '@/store/login/login';
-import { useRouter } from 'vue-router';
-
+import { useRouter, useRoute } from 'vue-router';
+import { defineProps, ref } from 'vue';
+import { mapPathToMenu } from '@/utils/map-menus';
 // 0 接收props
 defineProps({
   isFold: {
@@ -47,8 +48,9 @@ defineProps({
     default: false
   }
 })
-// 1.获取动态的菜单
+// 1.获取动态的路由映射表
 const loginStore = useLoginStore()
+// userMenus是从后端获取的路由映射表
 const userMenus = loginStore.userMenus
 // 2.监听item的点击
 const router = useRouter()
@@ -56,6 +58,14 @@ function handleItemClick(item: any) {
   const url = item.url
   router.push(url)
 }
+
+// 3.ElMenu的默认菜单
+
+// 获取当前路由
+const route = useRoute()
+// 匹配当前路由获取对应的id
+const pathMenu = mapPathToMenu(route.path, userMenus)
+const defaultActive = ref(pathMenu.id + '')
 </script>
 
 <style lang="less" scoped>

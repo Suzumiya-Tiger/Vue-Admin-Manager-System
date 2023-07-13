@@ -5,24 +5,23 @@ import './assets/css/index.less'
 import App from './App.vue'
 import router from './router'
 // pinia也必须要调用才能在vue中使用
-import pinia from './store'
-import registerIcons from './global/regitster-icons'
+import icons from './global/regitster-icons'
+import store from './store'
 const app = createApp(App)
-// 0.针对ElMessage和ElLoading等组件引入样式
-/* 这种操作非常麻烦，所以只需直接在vite.config.ts中配置vite-plugin-style-import
-即可实现样式库的按需引入 */
-// import 'element-plus/theme-chalk/el-message.css'
 
-/* vite-plugin-style-import的使用：
-1.pnpm install sass vite-plugin-style-import consola -D
-2.在vite.config.ts中配置相关内容
+app.use(icons)
+app.use(store)
+// 刷新获取路由映射表(已授权情况下)应该建立在pinia的架构创建之后,所以这里统一
+// 封装到store的出口文件之中
+/* 这里有一点必须要注意，路由的注入/注册不依赖于app.use(router)是否建立
+   但是！app.use(router)如果先一步执行，建设出来的路由映射表只有静态路由，
+   所以应该先注册路由，再执行app.use(router)
 */
-// 1.全局注册elementPlus
-/* import ElementPlus from 'element-plus'
-import 'element-plus/dist/index.css' */
-// 2.按需引入elementPlus:用到哪个组件引入哪个组件
-// 链式调用(被调用的函数全部生效)
+// 在路由全部注册完毕之后再加载router,防止在main页面刷新时路由守卫失效
+// 在login页面登录的时候，app.use(router)的执行顺序并不重要，因为login页面并没有路由守卫，
+// 也用不上对应的路由映射表，所以不会出现路由守卫失效的情况
 app.use(router)
-app.use(pinia)
-app.use(registerIcons)
 app.mount('#app')
+
+// 针对ElMessage和ElLoading等组件引入样式
+/* 部分引入或者全局引入不合理，所以只需直接在vite.config.ts中配置vite-plugin-style-import 即可实现样式库的按需引入 */

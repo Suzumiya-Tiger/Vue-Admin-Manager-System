@@ -30,9 +30,9 @@ const bar = (): number => {
 const useLoginStore = defineStore('login', {
   // 如何指定state的类型
   state: (): ILoginState => ({
-    token: localCache.getCache(LOGIN_TOKEN) ?? '',
-    userInfo: localCache.getCache('userInfo') ?? {},
-    userMenus: localCache.getCache('userMenus') ?? []
+    token: '',
+    userInfo: {},
+    userMenus: []
   }),
   actions: {
     async loginAccountAction(account: IAccount) {
@@ -48,8 +48,8 @@ const useLoginStore = defineStore('login', {
       const userInfoResult = await getUserInfoById(id)
       const userInfo = userInfoResult.data
       this.userInfo = userInfo
-      // 4.根据角色请求用户的权限(菜单menus)
-      // 获取菜单(userMenus)
+      // 4.根据角色请求用户的权限(路由映射表menus)
+      // 获取路由映射表(userMenus)
       // 代码写在对应的位置
       const userMenusResult = await getUserMenuByRoleId(this.userInfo.role.id)
       const userMenus = userMenusResult.data
@@ -59,14 +59,34 @@ const useLoginStore = defineStore('login', {
       // 以LOGIN_TOKEN的键名存入token
       localCache.setCache('userInfo', userInfo)
       localCache.setCache('userMenus', userMenus)
-      // 6.(重要)动态地通过菜单添加路由
+      // 6.(重要)动态地通过路由映射表添加路由
+      // 登录时调用mapMenusToRoutes获取符合权限的路由映射表
       const routes = mapMenusToRoutes(userMenus)
       routes.forEach((route) => {
         // 最终嵌套进去的路由还是本地定义的路由对象，用于vue-router的导航
         router.addRoute('main', route)
       })
-      // 7.页面跳转(main页面)
+      // 7.页面跳转(main页面),后续操作包含了已登录的情况下，跳转至指定的firstMenu路由
       router.push('/main')
+    },
+    // 默认在已登录的情况下，刷新页面后再次获取符合权限的路由映射表
+    loadLocalCacheAction() {
+      // 用户刷新默认加载数据
+      const token = localCache.getCache(LOGIN_TOKEN)
+      const userInfo = localCache.getCache('userInfo')
+      const userMenus = localCache.getCache('userMenus')
+      // 只有token，个人信息，路由映射表都存在时才进行路由路由映射表的数据加载(代表验证登录成功)
+      if (token && userInfo && userMenus) {
+        this.token = token
+        this.userInfo = userInfo
+        this.userMenus = userMenus
+        // 动态添加路由
+        // 在已登录的情况下为了获取路由映射表，调用mapMenusToRoutes获取符合权限的路由映射表
+        const routes = mapMenusToRoutes(userMenus)
+        routes.forEach((route) => {
+          router.addRoute('main', route)
+        })
+      }
     }
   }
 })
