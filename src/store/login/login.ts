@@ -7,7 +7,7 @@ import {
 
 import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'
-
+import { mapMenusToRoutes } from '@/utils/map-menus'
 import router from '@/router'
 import { LOGIN_TOKEN } from '@/global/constants'
 import type { RouteRecordRaw } from 'vue-router'
@@ -59,32 +59,12 @@ const useLoginStore = defineStore('login', {
       // 以LOGIN_TOKEN的键名存入token
       localCache.setCache('userInfo', userInfo)
       localCache.setCache('userMenus', userMenus)
-
       // 6.(重要)动态地通过菜单添加路由
-      // 根据菜单动态的添加路由对象(路由对象放在独立的文件之中)
-      // 1.动态的添加所有的路由对象，放在数组中
-      // *路由对象都在独立的文件之中
-      // *在文件中将所有的路由对象先读取到数组中
-      const localRoutes: RouteRecordRaw[] = []
-      // 1.1.利用import.meta.glob()读取router/main当中所有的ts文件
-      // eager代表取消import.meta的回调函数，而是直接取得回调的结果
-      // 添加: Record<string, any>是为了避免routerFiles的类型为unknown
-      const routerFiles: Record<string, any> = import.meta.glob(
-        '../../router/main/**/*.ts',
-        {
-          eager: true
-        }
-      )
-      for (const key in routerFiles) {
-        const module = routerFiles[key]
-        //  module.default => 路由对象
-        // 将路由对象添加到localRoutes里面
-        localRoutes.push(module.default)
-      }
-      console.log(routerFiles)
-      // 2.根据菜单去匹配正确的路由
-      // *router.addRoute('main',xx)
-
+      const routes = mapMenusToRoutes(userMenus)
+      routes.forEach((route) => {
+        // 最终嵌套进去的路由还是本地定义的路由对象，用于vue-router的导航
+        router.addRoute('main', route)
+      })
       // 7.页面跳转(main页面)
       router.push('/main')
     }
