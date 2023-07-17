@@ -2,12 +2,12 @@
   <div class="main-header">
     <div class="menu-icon" @click="handleFoldClick">
       <el-icon size="24px">
-        <component :is="isFold?'Expand':'Fold'">
-        </component>
+        <component :is="isFold ? 'Expand' : 'Fold'"> </component>
       </el-icon>
     </div>
     <div class="content">
       <header-crumb />
+      <header-info />
     </div>
   </div>
 </template>
@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import HeaderCrumb from './c-cpns/header-crumb.vue'
+import HeaderInfo from './c-cpns/header-info.vue'
 // 0 内部自定义事件
 const emit = defineEmits(['foldChange'])
 const isFold = ref(false)

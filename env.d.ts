@@ -10,3 +10,5 @@ declare module '*.vue' {
   // 导出 component 变量，这样其他地方在导入 ".vue" 文件时，TypeScript 编译器会将它识别为一个 Vue 组件
   export default component
 }
+
+declare module '*.mjs'

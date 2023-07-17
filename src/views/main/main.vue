@@ -10,7 +10,6 @@
         </el-header>
         <el-main>
           <router-view></router-view>
-
         </el-main>
       </el-container>
     </el-container>
@@ -22,12 +21,10 @@ import { ref } from 'vue'
 import MainMenu from '@/components/main-menu/main-menu.vue'
 import MainHeader from '@/components/main-header/main-header.vue'
 
-
 // 处理main-header中折叠的变化
 const isFold = ref(false)
 function handleFoldChange(isFoldValue: boolean) {
   isFold.value = isFoldValue
-
 }
 </script>
 
@@ -47,7 +44,7 @@ function handleFoldChange(isFoldValue: boolean) {
     text-align: left;
     cursor: pointer;
     background-color: #001529;
-    transition: width 2s linear;
+    transition: width 0.3s linear;
     scrollbar-width: none;
     /* firefox */
     -ms-overflow-style: none;

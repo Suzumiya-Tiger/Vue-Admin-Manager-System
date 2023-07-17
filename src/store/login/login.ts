@@ -11,6 +11,7 @@ import { mapMenusToRoutes } from '@/utils/map-menus'
 import router from '@/router'
 import { LOGIN_TOKEN } from '@/global/constants'
 import type { RouteRecordRaw } from 'vue-router'
+import useMainStore from '../main/main'
 
 interface ILoginState {
   token: string
@@ -59,14 +60,17 @@ const useLoginStore = defineStore('login', {
       // 以LOGIN_TOKEN的键名存入token
       localCache.setCache('userInfo', userInfo)
       localCache.setCache('userMenus', userMenus)
-      // 6.(重要)动态地通过路由映射表添加路由
+      // 6.请求所有的roles/departments数据
+      const mainStore = useMainStore()
+      mainStore.fetchEntireDataAction()
+      // 7.(重要)动态地通过路由映射表添加路由
       // 登录时调用mapMenusToRoutes获取符合权限的路由映射表
       const routes = mapMenusToRoutes(userMenus)
       routes.forEach((route) => {
         // 最终嵌套进去的路由还是本地定义的路由对象，用于vue-router的导航
         router.addRoute('main', route)
       })
-      // 7.页面跳转(main页面),后续操作包含了已登录的情况下，跳转至指定的firstMenu路由
+      // 8.页面跳转(main页面),后续操作包含了已登录的情况下，跳转至指定的firstMenu路由
       router.push('/main')
     },
     // 默认在已登录的情况下，刷新页面后再次获取符合权限的路由映射表
@@ -80,7 +84,10 @@ const useLoginStore = defineStore('login', {
         this.token = token
         this.userInfo = userInfo
         this.userMenus = userMenus
-        // 动态添加路由
+        // 1.请求所有的roles/departments数据
+        const mainStore = useMainStore()
+        mainStore.fetchEntireDataAction()
+        // 2.动态添加路由
         // 在已登录的情况下为了获取路由映射表，调用mapMenusToRoutes获取符合权限的路由映射表
         const routes = mapMenusToRoutes(userMenus)
         routes.forEach((route) => {
