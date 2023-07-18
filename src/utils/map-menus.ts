@@ -27,6 +27,7 @@ function loadLocalRoutes() {
 // 初次加载时单独定义该全局变量(首次加载的路由)
 export let firstMenu: any = null
 
+// 这里的功能主要分为两个部分：1.根据路由映射表去匹配正确的路由 2.加载面包屑
 export function mapMenusToRoutes(userMenus: any[]) {
   // 1.先加载本地的路由
   const localRoutes = loadLocalRoutes()

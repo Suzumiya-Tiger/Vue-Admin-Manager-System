@@ -44,7 +44,6 @@ router.beforeEach((to, from) => {
   }
   // 在前置守卫的连接操作中，针对已登录的情况下，如果登录操作完成时在main页面并且token存在
   if (to.path === '/main' && token) {
-    console.log(firstMenu)
     return firstMenu?.url
   }
 })

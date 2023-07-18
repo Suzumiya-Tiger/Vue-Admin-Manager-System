@@ -11,7 +11,6 @@ import {
 import { defineStore } from 'pinia'
 import type { ISystemState } from './type'
 import { filterEmptyParams } from '@/utils/filter-param'
-import hyRequest from '@/service'
 const useSystemStore = defineStore('system', {
   state: (): ISystemState => ({
     usersList: [],
