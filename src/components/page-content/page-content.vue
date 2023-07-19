@@ -53,9 +53,18 @@
               </template>
             </el-table-column>
           </template>
+          <!-- 高阶组件：通过插槽来更为灵活地实现特殊需求，
+                将具体的操作移交给组件调用的模板语法之中去自定义实现 -->
+          <template v-else-if="item.type === 'custom'">
+            <el-table-column :label="item.label" :width="item.width">
+              <template #default="scope">
+                <slot :name="item.slotName" v-bind="scope"></slot>
+              </template>
+            </el-table-column>
+          </template>
           <!-- v-bind="item"相当于v-bind="{name:item.name,width:item.width...}" -->
           <!-- 这是解构语法的体现 -->
-          <el-table-column v-else v-bind="item" />
+          <template v-else> <el-table-column v-bind="item" /></template>
         </template>
       </el-table>
     </div>
@@ -85,6 +94,7 @@ import { ElMessage } from 'element-plus'
 
 interface IProps {
   contentConfig: {
+    pageName: string
     headers?: {
       title?: string
       btnTitle?: string
@@ -140,7 +150,7 @@ function fetchPageListData(formData: any = {}) {
   const pageInfo = { size, offset }
   // 2.发送网络请求
   const queryInfo = { ...pageInfo, ...formData }
-  systemStore.postPageListAction('department', queryInfo)
+  systemStore.postPageListAction(props.contentConfig.pageName, queryInfo)
 }
 // 4.删除用户
 async function handleDeleteClick(id: number) {
@@ -155,7 +165,10 @@ async function handleDeleteClick(id: number) {
   因此，为了确保在访问数据之前已经完成解析，需要使用 await 关键字来等待 Promise 对象的解析完成。
   这样，你可以确保 delRes 变量中保存的是解析后的数据，而不是 Promise 对象。
   */
-  const delRes = await systemStore.deletePageByIdAction('department', id)
+  const delRes = await systemStore.deletePageByIdAction(
+    props.contentConfig.pageName,
+    id
+  )
   if (Number(delRes.code)) {
     ElMessage({
       message: delRes.data,
