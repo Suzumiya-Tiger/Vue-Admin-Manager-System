@@ -2,8 +2,12 @@
   <div class="modal">
     <el-dialog
       v-model="dialogVisible"
-      :title="modalType === 'create' ? '新建部门' : '编辑部门'"
-      width="40%"
+      :title="
+        modalType === 'create'
+          ? modalConfig.header.newTitle
+          : modalConfig.header.editTitle
+      "
+      :width="modalConfig.width ?? '40px'"
       center
     >
       <div class="form">
@@ -13,24 +17,44 @@
           label-width="80px"
           :rules="formRules"
         >
-          <el-form-item label="部门" prop="name">
-            <el-input v-model="formData.name" placeholder="请输入部门" />
-          </el-form-item>
-          <el-form-item label="部门领导" prop="leader">
-            <el-input v-model="formData.leader" placeholder="请输入部门领导" />
-          </el-form-item>
-
-          <el-form-item label="上级部门" prop="parentId">
-            <el-select
-              v-model="formData.parentId"
-              placeholder="请选择上级部门"
-              style="width: 100%"
-            >
-              <template v-for="item in entireDepartments" :key="item.id">
-                <el-option :value="item.id" :label="item.name" />
+          <template v-for="item in modalConfig.formItems" :key="item.prop">
+            <el-form-item :label="item.label" :prop="item.prop">
+              <template v-if="item.type === 'input'">
+                <el-input
+                  v-model="formData[item.prop]"
+                  :placeholder="item.placeholder"
+                ></el-input>
               </template>
-            </el-select>
-          </el-form-item>
+              <template v-else-if="item.type === 'date-picker'">
+                <el-date-picker
+                  v-model="formData[item.prop]"
+                  type="daterange"
+                  format="YYYY-MM-DD"
+                  :range-separator="item.rangeSeparator"
+                  start-placeholder="开始时间"
+                  end-placeholder="结束时间"
+                  size="default"
+                />
+              </template>
+              <template v-else-if="item.type === 'select'">
+                <el-select
+                  v-model="formData[item.prop]"
+                  :placeholder="item.placeholder"
+                  style="width: 100%"
+                >
+                  <template
+                    v-for="itemOption in item.options"
+                    :key="itemOption.value"
+                  >
+                    <el-option
+                      :label="itemOption.label"
+                      :value="itemOption.value"
+                    ></el-option>
+                  </template>
+                </el-select>
+              </template>
+            </el-form-item>
+          </template>
         </el-form>
       </div>
       <template #footer>
@@ -45,33 +69,44 @@
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { storeToRefs } from 'pinia'
-import useMainStore from '@/store/main/main'
+import type { IModalProps } from './type'
 import useSystemStore from '@/store/main/system/system'
 import { ElForm, ElMessage, type FormRules } from 'element-plus'
-
+// 0.定义props
+const props = defineProps<IModalProps>()
 const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
 // 获取表单的ref
 const modalForm = ref()
 // 1.定义模态框相关数据
 const dialogVisible = ref(false)
-let formData = reactive<any>({
-  name: '',
-  leader: '',
-  parentId: ''
-})
-const editData = ref()
+// 定义form的数据
+const initialForm: any = reactive({})
+const formRules: FormRules = {
+  /*   realname: [{ required: true, message: '必须输入真实姓名', trigger: 'blur' }]
+   */
+}
+for (const item of props.modalConfig.formItems) {
+  initialForm[item.prop] = item.initialValue ?? ''
+  item.required
+    ? (formRules[item.label] = {
+        required: true,
+        message: item.placeholder,
+        trigger: item.type === 'input' ? 'blur' : 'change'
+      })
+    : null
+}
+// 通过reactive将initialForm转换为响应式对象
+const formData = initialForm
+let editData = reactive({ id: -1 })
 // 定义编辑/新建的区分状态
 const modalType = ref('')
 // 获取mainStore中的数据
-const mainStore = useMainStore()
+// const mainStore = useMainStore()
 // 获取systemStore中的数据
 const systemStore = useSystemStore()
 // 利用pinia的storeToRefs保持取出数据的响应式特性
-const { entireDepartments } = storeToRefs(mainStore)
-const formRules: FormRules = {
-  realname: [{ required: true, message: '必须输入真实姓名', trigger: 'blur' }]
-}
+// const { entireDepartments } = storeToRefs(mainStore)
+
 // 2.定义设置dialogVisible的方法
 function setModalVisible(rowData: any = {}) {
   // vue3中利用Object.keys()解析reactive对象可以获取对象的所有属性的名称
@@ -81,13 +116,14 @@ function setModalVisible(rowData: any = {}) {
     for (const key in formData) {
       formData[key] = rowData[key]
     }
-    editData.value = rowData
+    editData = reactive(rowData)
   } else {
     modalType.value = 'create'
+    // 对新建的数据进行初始化
     for (const key in formData) {
       formData[key] = ''
     }
-    editData.value = null
+    editData = reactive({ id: -1 })
   }
   dialogVisible.value = true
 }
@@ -99,17 +135,20 @@ function dialogClose() {
 async function dialogSubmit() {
   if (modalType.value === 'create') {
     // 提交创建结果
-    const res = await systemStore.newPageDataACtion('department', formData)
+    const res = await systemStore.newPageDataAction(
+      props.modalConfig.pageName,
+      formData
+    )
     if (Number(res.code)) {
       ElMessage.error(res.data)
       return
     }
     ElMessage.success('创建成功')
     emit('create-btn-click')
-  } else {
+  } else if (modalType.value === 'edit') {
     const res = await systemStore.editPageDataAction(
-      'department',
-      editData.value?.id,
+      props.modalConfig.pageName,
+      editData.id ?? '',
       formData
     )
     if (Number(res.code)) {

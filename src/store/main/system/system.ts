@@ -60,7 +60,7 @@ const useSystemStore = defineStore('system', {
       const deleteResult = await deletePageById(pageName, id)
       return deleteResult
     },
-    async newPageDataACtion(pageName: string, pageInfo: any) {
+    async newPageDataAction(pageName: string, pageInfo: any) {
       const newResult = await newPageData(pageName, pageInfo)
       return newResult
     },
