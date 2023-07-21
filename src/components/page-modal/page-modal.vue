@@ -7,7 +7,7 @@
           ? modalConfig.header.newTitle
           : modalConfig.header.editTitle
       "
-      :width="modalConfig.width ?? '40px'"
+      :width="modalConfig.width ?? '600px'"
       center
     >
       <div class="form">
@@ -81,11 +81,10 @@ const modalForm = ref()
 const dialogVisible = ref(false)
 // 定义form的数据
 const initialForm: any = reactive({})
-const formRules: FormRules = {
-  /*   realname: [{ required: true, message: '必须输入真实姓名', trigger: 'blur' }]
-   */
-}
+// 定义form的校验规则
+const formRules: FormRules = {}
 for (const item of props.modalConfig.formItems) {
+  
   initialForm[item.prop] = item.initialValue ?? ''
   item.required
     ? (formRules[item.label] = {

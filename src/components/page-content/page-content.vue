@@ -134,13 +134,6 @@ fetchPageListData()
 当你在使用 Pinia 来管理应用程序的状态时，存储中的状态通常是响应式的 */
 const { pageList, pageTotalCount } = storeToRefs(systemStore)
 
-const tranferEnable = computed(() => {
-  // 3.对usersList的数据进行处理，转换成表格需要的数据格式
-  return (enable: number) => {
-    return enable ? '启用' : '禁用'
-  }
-})
-
 // 3.定义函数用于发送网络请求
 // formData可能是空的，这里要进行默认数据判断处理
 function fetchPageListData(formData: any = {}) {

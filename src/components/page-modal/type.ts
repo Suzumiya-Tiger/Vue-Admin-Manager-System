@@ -2,10 +2,10 @@ interface formItemType {
   type: string
   prop: string
   label: string
-  placeholder: string
-  span: number
-  initialValue: string
-  required: boolean
+  placeholder?: string
+  span?: number
+  initialValue?: string
+  required?: boolean
   rangeSeparator?: string
   options?: any[]
 }

@@ -3,7 +3,7 @@
     <page-search
       :search-config="searchConfig"
       @query-click="handleQueryClick"
-      @reset-click="handleQueryClick"
+      @reset-click="handleResetClick"
     ></page-search>
     <page-content
       :content-config="contentConfig"
@@ -28,17 +28,25 @@
 
 <script setup lang="ts" name="department">
 import { ref, computed } from 'vue'
-// 导入功能组件
-import PageSearch from '@/components/page-search/page-search.vue'
+import useMainStore from '@/store/main/main'
+
+// 1.导入组件(vueComponent)
+// 2.导入数据通用配置(config)
+// 3.导入交互逻辑(hooks)import PageSearch from '@/components/page-search/page-search.vue'
 import PageContent from '@/components/page-content/page-content.vue'
 import PageModal from '@/components/page-modal/page-modal.vue'
 
-// 导入通用数据的配置
 import searchConfig from './config/search.config'
 import contentConfig from './config/content.config'
 import modalConfig from './config/modal.config'
-import useMainStore from '@/store/main/main'
 
+import usePageContent from '@/hooks/usePageContent'
+import usePageModal from '@/hooks/usePageModal'
+/* setup相同的逻辑的抽取：hooks */
+// 点击search,content的操作
+const { contentRef, handleQueryClick, handleResetClick } = usePageContent()
+// 点击content,modal的操作
+const { modalRef, handleNewClick, handleEditClick } = usePageModal()
 // 对modalConfig进行操作
 const modalConfigRef = computed(() => {
   const mainStore = useMainStore()
@@ -55,19 +63,6 @@ const modalConfigRef = computed(() => {
   })
   return modalConfig
 })
-// 点击search,content的操作
-const contentRef = ref<InstanceType<typeof PageContent>>()
-function handleQueryClick(queryInfo: any) {
-  contentRef.value?.fetchPageListData(queryInfo)
-}
-
-const modalRef = ref<InstanceType<typeof PageModal>>()
-function handleNewClick() {
-  modalRef.value?.setModalVisible()
-}
-function handleEditClick(rowData: any) {
-  modalRef.value?.setModalVisible(rowData)
-}
 </script>
 <style scoped>
 .department {
