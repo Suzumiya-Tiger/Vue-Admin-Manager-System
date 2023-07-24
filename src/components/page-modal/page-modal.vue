@@ -36,7 +36,7 @@
                   size="default"
                 />
               </template>
-              <template v-else-if="item.type === 'select'">
+              <template v-else-if="item.type === 'select' && isShow(item)">
                 <el-select
                   v-model="formData[item.prop]"
                   :placeholder="item.placeholder"
@@ -68,10 +68,20 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import type { IModalProps } from './type'
+import { computed, reactive, ref } from 'vue'
+import type { IModalProps, formItemType } from './type'
 import useSystemStore from '@/store/main/system/system'
 import { ElForm, ElMessage, type FormRules } from 'element-plus'
+const isShow = computed(() => {
+  return (item: formItemType) => {
+    if (item.prop !== 'sort') {
+      return true
+    } else {
+      return formData.type !== 1
+    }
+  }
+})
+
 // 0.定义props
 const props = defineProps<IModalProps>()
 const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
@@ -84,7 +94,6 @@ const initialForm: any = reactive({})
 // 定义form的校验规则
 const formRules: FormRules = {}
 for (const item of props.modalConfig.formItems) {
-  
   initialForm[item.prop] = item.initialValue ?? ''
   item.required
     ? (formRules[item.label] = {
@@ -94,7 +103,6 @@ for (const item of props.modalConfig.formItems) {
       })
     : null
 }
-// 通过reactive将initialForm转换为响应式对象
 const formData = initialForm
 let editData = reactive({ id: -1 })
 // 定义编辑/新建的区分状态
@@ -115,7 +123,10 @@ function setModalVisible(rowData: any = {}) {
     for (const key in formData) {
       formData[key] = rowData[key]
     }
-    editData = reactive(rowData)
+    if (rowData.type && rowData.type === 1 && rowData.sort) {
+      formData.type = rowData.type
+    }
+    editData = reactive(formData)
   } else {
     modalType.value = 'create'
     // 对新建的数据进行初始化
@@ -145,13 +156,20 @@ async function dialogSubmit() {
     ElMessage.success('创建成功')
     emit('create-btn-click')
   } else if (modalType.value === 'edit') {
+    /* 针对菜单管理修改的过滤 */
+    console.log(formData)
+    if (props.modalConfig.pageName === 'menu') {
+      formData.type = null
+      // formData.sort = null
+    }
     const res = await systemStore.editPageDataAction(
       props.modalConfig.pageName,
       editData.id ?? '',
       formData
     )
-    if (Number(res.code)) {
-      ElMessage.error(res.data)
+    console.log(res)
+    if (Number(res.code) || res.code === 'ERR_BAD_REQUEST') {
+      ElMessage.error(res.data || '请求失败')
       return
     }
     ElMessage.success('修改成功')

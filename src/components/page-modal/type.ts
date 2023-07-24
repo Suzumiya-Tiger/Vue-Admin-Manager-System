@@ -1,4 +1,4 @@
-interface formItemType {
+export interface formItemType {
   type: string
   prop: string
   label: string
@@ -7,6 +7,8 @@ interface formItemType {
   initialValue?: string
   required?: boolean
   rangeSeparator?: string
+  parentId?: number
+  permission?: string
   options?: any[]
 }
 

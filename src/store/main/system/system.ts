@@ -65,7 +65,11 @@ const useSystemStore = defineStore('system', {
       return newResult
     },
     async editPageDataAction(pageName: string, id: number, pageInfo: any) {
-      const editResult = await editPageData(pageName, id, pageInfo)
+      const editResult = await editPageData(
+        pageName,
+        id,
+        filterEmptyParams(pageInfo)
+      )
       return editResult
     }
   }

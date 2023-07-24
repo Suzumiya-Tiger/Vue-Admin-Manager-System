@@ -7,13 +7,24 @@
       }}</el-button>
     </div>
     <div class="table">
-      <el-table :data="pageList" border style="width: 100%">
+      <el-table
+        :data="pageList"
+        border
+        style="width: 100%"
+        :row-key="contentConfig?.childTree?.rowkey"
+        :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
+      >
         <template v-for="item in contentConfig.propsList" :key="item.prop">
-          <template v-if="item.type === 'timer'">
+          <template v-if="item.type && item.type === 'timer'">
             <el-table-column :label="item.label">
               <template #default="scope">
                 <div style="display: flex; align-items: center">
-                  {{ formatUTC(scope.row[item.prop], 'YYYY-MM-DD hh:mm:ss') }}
+                  {{
+                    formatUTC(
+                      item.prop ? scope.row[item.prop] : '',
+                      'YYYY-MM-DD hh:mm:ss'
+                    )
+                  }}
                 </div>
               </template>
             </el-table-column>
@@ -76,10 +87,10 @@
         :small="small"
         :disabled="disabled"
         :background="background"
-        layout="total,prev,  pager,next,sizes,jumper"
-        :total="pageTotalCount"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        layout="total,prev, pager,next,sizes,jumper"
+        :page-count="pageTotalCount"
+        @update:current-page="handleCurrentChange"
+        @update:page-size="handleSizeChange"
       />
     </div>
   </div>
@@ -91,18 +102,8 @@ import useSystemStore from '@/store/main/system/system'
 import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
 import { ElMessage } from 'element-plus'
+import type { IProps } from './type'
 
-interface IProps {
-  contentConfig: {
-    pageName: string
-    headers?: {
-      title?: string
-      btnTitle?: string
-    }
-    // 动态地生成tableList
-    propsList: any[]
-  }
-}
 const props = defineProps<IProps>()
 // 定义事件
 const emit = defineEmits(['newBtnClick', 'editBtnClick', 'deleteBtnClick'])
