@@ -81,10 +81,10 @@
         :small="small"
         :disabled="disabled"
         :background="background"
-        layout="total,prev,  pager,next,sizes,jumper"
+        layout="total,prev, pager,next,sizes,jumper"
         :total="usersTotalCount"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
+        @update:current-page="handleCurrentChange"
+        @update:page-size="handleSizeChange"
       />
     </div>
   </div>

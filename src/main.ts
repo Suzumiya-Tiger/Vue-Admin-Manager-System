@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import 'default-passive-events'
 // 公用的基础css文件
 import 'normalize.css'
 import './assets/css/index.less'
