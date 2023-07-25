@@ -29,7 +29,7 @@ import modalConfig from './config/modal.config'
 const { modalRef, handleNewClick, handleEditClick } = usePageModal()
 const { contentRef, handleQueryClick } = usePageContent()
 
-// 获取modal内部的option的数据来源
+// 从pinia中获取modal内部的option的数据来源
 const modalConfigRef = computed(() => {
   const mainStore = useSystemStore()
   const menuList = mainStore.pageList.map((item) => {

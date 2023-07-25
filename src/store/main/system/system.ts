@@ -61,7 +61,7 @@ const useSystemStore = defineStore('system', {
       return deleteResult
     },
     async newPageDataAction(pageName: string, pageInfo: any) {
-      const newResult = await newPageData(pageName, pageInfo)
+      const newResult = await newPageData(pageName, filterEmptyParams(pageInfo))
       return newResult
     },
     async editPageDataAction(pageName: string, id: number, pageInfo: any) {

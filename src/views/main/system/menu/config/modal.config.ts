@@ -22,7 +22,7 @@ const modalConfig: IModalConfig = {
       prop: 'sort',
       options: [],
       parentId: 0,
-      initialValue: '',
+      initialValue: [],
       placeholder: '请选择上级菜单',
       required: false
     }

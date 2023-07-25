@@ -15,7 +15,7 @@ const modalConfig: IModalConfig = {
       label: '部门名称',
       placeholder: '请输入部门名称',
       span: 8,
-      initialValue: '1111',
+      initialValue: '',
       required: false
     },
     {
@@ -24,7 +24,7 @@ const modalConfig: IModalConfig = {
       label: '上级部门',
       placeholder: '请选择上级部门',
       span: 8,
-      initialValue: '',
+      initialValue: [],
       options: [],
       required: false
     },

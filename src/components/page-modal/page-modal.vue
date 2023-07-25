@@ -18,14 +18,21 @@
           :rules="formRules"
         >
           <template v-for="item in modalConfig.formItems" :key="item.prop">
-            <el-form-item :label="item.label" :prop="item.prop">
-              <template v-if="item.type === 'input'">
+            <el-form-item :prop="item.prop">
+              <template #label v-if="!item.hidden">
+                <span>{{ item.label }}</span>
+              </template>
+              <template #default v-if="item.type === 'input'">
                 <el-input
                   v-model="formData[item.prop]"
                   :placeholder="item.placeholder"
                 ></el-input>
               </template>
-              <template v-else-if="item.type === 'date-picker'">
+              <template #default v-else-if="item.type === 'custom'">
+                <slot :name="item.slotName"></slot>
+              </template>
+
+              <template #default v-else-if="item.type === 'date-picker'">
                 <el-date-picker
                   v-model="formData[item.prop]"
                   type="daterange"
@@ -36,7 +43,10 @@
                   size="default"
                 />
               </template>
-              <template v-else-if="item.type === 'select' && isShow(item)">
+              <template
+                #default
+                v-else-if="item.type === 'select' && isShow(item)"
+              >
                 <el-select
                   v-model="formData[item.prop]"
                   :placeholder="item.placeholder"
@@ -71,6 +81,7 @@
 import { computed, reactive, ref } from 'vue'
 import type { IModalProps, formItemType } from './type'
 import useSystemStore from '@/store/main/system/system'
+import deepCopyReactive from '@/utils/deepCopyReactive'
 import { ElForm, ElMessage, type FormRules } from 'element-plus'
 const isShow = computed(() => {
   return (item: formItemType) => {
@@ -94,17 +105,21 @@ const initialForm: any = reactive({})
 // 定义form的校验规则
 const formRules: FormRules = {}
 for (const item of props.modalConfig.formItems) {
-  initialForm[item.prop] = item.initialValue ?? ''
+  initialForm[item.prop] = item.initialValue ?? null
   item.required
-    ? (formRules[item.label] = {
-        required: true,
-        message: item.placeholder,
-        trigger: item.type === 'input' ? 'blur' : 'change'
-      })
+    ? (formRules[item.label] = [
+        {
+          required: true,
+          message: item.placeholder,
+          trigger: item.type === 'input' ? 'blur' : 'change'
+        }
+      ])
     : null
 }
-const formData = initialForm
-let editData = reactive({ id: -1 })
+// 利用深拷贝将initialForm的值赋值给formData
+const formData = deepCopyReactive(initialForm)
+let editData = reactive(formData)
+
 // 定义编辑/新建的区分状态
 const modalType = ref('')
 // 获取mainStore中的数据
@@ -118,6 +133,7 @@ const systemStore = useSystemStore()
 function setModalVisible(rowData: any = {}) {
   // vue3中利用Object.keys()解析reactive对象可以获取对象的所有属性的名称
   const isEmptyRow = Object.keys(rowData).length === 0
+  // 判断是否是新建还是编辑
   if (!isEmptyRow) {
     modalType.value = 'edit'
     for (const key in formData) {
@@ -126,14 +142,14 @@ function setModalVisible(rowData: any = {}) {
     if (rowData.type && rowData.type === 1 && rowData.sort) {
       formData.type = rowData.type
     }
+    // 将rowData赋值给editData
     editData = reactive(formData)
   } else {
     modalType.value = 'create'
     // 对新建的数据进行初始化
     for (const key in formData) {
-      formData[key] = ''
+      formData[key] = initialForm[key]
     }
-    editData = reactive({ id: -1 })
   }
   dialogVisible.value = true
 }
@@ -143,11 +159,16 @@ function dialogClose() {
   modalForm.value?.resetFields()
 }
 async function dialogSubmit() {
+  let infoData = { ...formData }
+  // 将树状选择器的数据赋值给infoData，用于提交
+  if (props.modalConfig.otherInfo) {
+    infoData = { ...infoData, ...props.modalConfig.otherInfo }
+  }
   if (modalType.value === 'create') {
     // 提交创建结果
     const res = await systemStore.newPageDataAction(
       props.modalConfig.pageName,
-      formData
+      infoData
     )
     if (Number(res.code)) {
       ElMessage.error(res.data)
@@ -157,17 +178,14 @@ async function dialogSubmit() {
     emit('create-btn-click')
   } else if (modalType.value === 'edit') {
     /* 针对菜单管理修改的过滤 */
-    console.log(formData)
     if (props.modalConfig.pageName === 'menu') {
       formData.type = null
-      // formData.sort = null
     }
     const res = await systemStore.editPageDataAction(
       props.modalConfig.pageName,
       editData.id ?? '',
-      formData
+      infoData
     )
-    console.log(res)
     if (Number(res.code) || res.code === 'ERR_BAD_REQUEST') {
       ElMessage.error(res.data || '请求失败')
       return

@@ -6,13 +6,23 @@ import type PageModal from '@/components/page-modal/page-modal.vue'
 以便在其他地方使用该组件的类型信息进行类型检查和推断。
 这在使用 Vue 3 和 TypeScript 时是一种非常方便的类型导入方式。
 */
+
+type EditFnType = (data: any, type: string) => void
+
 import type PageModal from '@/components/page-modal/page-modal.vue'
-function usePageModal() {
+function usePageModal(editCB?: EditFnType) {
   const modalRef = ref<InstanceType<typeof PageModal>>()
   function handleNewClick() {
+    if (editCB) {
+      editCB(null, 'new')
+    }
     modalRef.value?.setModalVisible()
   }
   function handleEditClick(rowData: any) {
+    // 如果存在回调函数，就执行回调函数
+    if (editCB) {
+      editCB(rowData, 'edit')
+    }
     modalRef.value?.setModalVisible(rowData)
   }
   // 以元祖的形式返回
