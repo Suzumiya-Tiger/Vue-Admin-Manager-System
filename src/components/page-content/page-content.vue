@@ -2,7 +2,7 @@
   <div class="content">
     <div class="header">
       <h3 class="title">{{ contentConfig.headers?.title ?? '数据列表' }}</h3>
-      <el-button type="primary" @click="createNewUserClick">{{
+      <el-button v-if="isCreate" type="primary" @click="createNewUserClick">{{
         contentConfig.headers?.btnTitle ?? '新建数据'
       }}</el-button>
     </div>
@@ -33,6 +33,7 @@
             <el-table-column :label="item.label" :width="item.width">
               <template #default="scope">
                 <el-button
+                  v-if="isUpdate"
                   size="small"
                   text
                   icon="Edit"
@@ -52,6 +53,7 @@
                 >
                   <template #reference>
                     <el-button
+                      v-if="isDelete"
                       size="small"
                       text
                       icon="Delete"
@@ -103,10 +105,20 @@ import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
 import { ElMessage } from 'element-plus'
 import type { IProps } from './type'
-
+import usePermissions from '@/hooks/usePermissions'
 const props = defineProps<IProps>()
 // 定义事件
 const emit = defineEmits(['newBtnClick', 'editBtnClick', 'deleteBtnClick'])
+
+// 0.获取是否存在对应的增删改查的权限
+
+const isCreate = usePermissions(`${props.contentConfig.pageName}:create`)
+
+const isDelete = usePermissions(`${props.contentConfig.pageName}:delete`)
+
+const isUpdate = usePermissions(`${props.contentConfig.pageName}:update`)
+
+const isQuery = usePermissions(`${props.contentConfig.pageName}:query`)
 
 // 分页器
 const small = ref(false)
@@ -138,6 +150,9 @@ const { pageList, pageTotalCount } = storeToRefs(systemStore)
 // 3.定义函数用于发送网络请求
 // formData可能是空的，这里要进行默认数据判断处理
 function fetchPageListData(formData: any = {}) {
+  if (!isQuery) {
+    return
+  }
   // 1.获取offset/size
   const size = pageSize.value
   const offset = (currentPage.value - 1) * size

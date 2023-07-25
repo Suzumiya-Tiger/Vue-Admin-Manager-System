@@ -7,17 +7,17 @@ import {
 
 import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'
-import { mapMenusToRoutes } from '@/utils/map-menus'
+import { mapMenusToRoutes, mapMenusToPermissions } from '@/utils/map-menus'
 import router from '@/router'
-import { LOGIN_TOKEN } from '@/global/constants'
-import type { RouteRecordRaw } from 'vue-router'
+import { LOGIN_TOKEN, USERINFO, USERMENUS } from '@/global/constants'
+// import type { RouteRecordRaw } from 'vue-router'
 import useMainStore from '../main/main'
-
 interface ILoginState {
   token: string
   // 也可以利用JSON TO TYPESCRIPT网站转换一下数据
   userInfo: any
   userMenus: any
+  permissions: string[]
 }
 
 /* 箭头函数指定类型讲解
@@ -33,7 +33,8 @@ const useLoginStore = defineStore('login', {
   state: (): ILoginState => ({
     token: '',
     userInfo: {},
-    userMenus: []
+    userMenus: [],
+    permissions: []
   }),
   actions: {
     async loginAccountAction(account: IAccount) {
@@ -58,11 +59,15 @@ const useLoginStore = defineStore('login', {
 
       // 5.进行本地缓存
       // 以LOGIN_TOKEN的键名存入token
-      localCache.setCache('userInfo', userInfo)
-      localCache.setCache('userMenus', userMenus)
+      localCache.setCache(USERINFO, userInfo)
+      localCache.setCache(USERMENUS, userMenus)
       // 6.请求所有的roles/departments数据
       const mainStore = useMainStore()
       mainStore.fetchEntireDataAction()
+
+      // (重要)获取登录用户的所有按钮的权限
+      const permissionList = mapMenusToPermissions(userMenus)
+      this.permissions = [...permissionList]
       // 7.(重要)动态地通过路由映射表添加路由
       // 登录时调用mapMenusToRoutes获取符合权限的路由映射表
       const routes = mapMenusToRoutes(userMenus)
@@ -73,12 +78,13 @@ const useLoginStore = defineStore('login', {
       // 8.页面跳转(main页面),后续操作包含了已登录的情况下，跳转至指定的firstMenu路由
       router.push('/main')
     },
+
     // 默认在已登录的情况下，刷新页面后再次获取符合权限的路由映射表
     loadLocalCacheAction() {
       // 用户刷新默认加载数据
       const token = localCache.getCache(LOGIN_TOKEN)
-      const userInfo = localCache.getCache('userInfo')
-      const userMenus = localCache.getCache('userMenus')
+      const userInfo = localCache.getCache(USERINFO)
+      const userMenus = localCache.getCache(USERMENUS)
       // 只有token，个人信息，路由映射表都存在时才进行路由路由映射表的数据加载(代表验证登录成功)
       if (token && userInfo && userMenus) {
         this.token = token
@@ -87,6 +93,9 @@ const useLoginStore = defineStore('login', {
         // 1.请求所有的roles/departments数据
         const mainStore = useMainStore()
         mainStore.fetchEntireDataAction()
+        // (重要)获取登录用户的所有按钮的权限
+        const permissionList = mapMenusToPermissions(userMenus)
+        this.permissions = [...permissionList]
         // 2.动态添加路由
         // 在已登录的情况下为了获取路由映射表，调用mapMenusToRoutes获取符合权限的路由映射表
         const routes = mapMenusToRoutes(userMenus)

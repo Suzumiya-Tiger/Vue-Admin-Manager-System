@@ -93,8 +93,11 @@ function editCallBack(itemData: any, type: string) {
     })
   } else {
     nextTick(() => {
+      // 清空用于数据提交时的树状图提交数据
       modalConfig.otherInfo = []
+      // 清空树状图回显的数据
       treeRef.value?.setCheckedKeys([])
+      // 清空树状图选择框中的数据
       menuValue.value = []
     })
   }

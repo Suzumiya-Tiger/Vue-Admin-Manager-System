@@ -11,6 +11,7 @@ import {
 import { defineStore } from 'pinia'
 import type { ISystemState } from './type'
 import { filterEmptyParams } from '@/utils/filter-param'
+import useMainStore from '../main'
 const useSystemStore = defineStore('system', {
   state: (): ISystemState => ({
     usersList: [],
@@ -47,6 +48,7 @@ const useSystemStore = defineStore('system', {
     },
 
     /* 针对所有通用页面的数据：根据其增删改查的特性进行封装 */
+
     async postPageListAction(pageName: string, queryInfo: any) {
       const pageListResult = await postPageListData(
         pageName,
@@ -58,10 +60,20 @@ const useSystemStore = defineStore('system', {
     },
     async deletePageByIdAction(pageName: string, id: number) {
       const deleteResult = await deletePageById(pageName, id)
+      // 重新请求新的数据并且注入pinia
+      this.postUsersListAction({ offset: 0, size: 10 })
+      // 获取完整的全局应用数据
+      const mainStore = useMainStore()
+      mainStore.fetchEntireDataAction()
       return deleteResult
     },
     async newPageDataAction(pageName: string, pageInfo: any) {
       const newResult = await newPageData(pageName, filterEmptyParams(pageInfo))
+      // 重新请求新的数据并且注入pinia
+      this.postUsersListAction({ offset: 0, size: 10 })
+      // 获取完整的全局应用数据
+      const mainStore = useMainStore()
+      mainStore.fetchEntireDataAction()
       return newResult
     },
     async editPageDataAction(pageName: string, id: number, pageInfo: any) {
@@ -70,6 +82,11 @@ const useSystemStore = defineStore('system', {
         id,
         filterEmptyParams(pageInfo)
       )
+      // 重新请求新的数据并且注入pinia
+      this.postUsersListAction({ offset: 0, size: 10 })
+      // 获取完整的全局应用数据
+      const mainStore = useMainStore()
+      mainStore.fetchEntireDataAction()
       return editResult
     }
   }
