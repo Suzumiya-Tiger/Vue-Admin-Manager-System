@@ -60,8 +60,7 @@ const useSystemStore = defineStore('system', {
     },
     async deletePageByIdAction(pageName: string, id: number) {
       const deleteResult = await deletePageById(pageName, id)
-      // 重新请求新的数据并且注入pinia
-      this.postUsersListAction({ offset: 0, size: 10 })
+
       // 获取完整的全局应用数据
       const mainStore = useMainStore()
       mainStore.fetchEntireDataAction()
@@ -69,8 +68,7 @@ const useSystemStore = defineStore('system', {
     },
     async newPageDataAction(pageName: string, pageInfo: any) {
       const newResult = await newPageData(pageName, filterEmptyParams(pageInfo))
-      // 重新请求新的数据并且注入pinia
-      this.postUsersListAction({ offset: 0, size: 10 })
+
       // 获取完整的全局应用数据
       const mainStore = useMainStore()
       mainStore.fetchEntireDataAction()
@@ -82,8 +80,6 @@ const useSystemStore = defineStore('system', {
         id,
         filterEmptyParams(pageInfo)
       )
-      // 重新请求新的数据并且注入pinia
-      this.postUsersListAction({ offset: 0, size: 10 })
       // 获取完整的全局应用数据
       const mainStore = useMainStore()
       mainStore.fetchEntireDataAction()

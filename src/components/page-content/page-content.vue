@@ -90,7 +90,7 @@
         :disabled="disabled"
         :background="background"
         layout="total,prev, pager,next,sizes,jumper"
-        :page-count="pageTotalCount"
+        :total="pageTotalCount"
         @update:current-page="handleCurrentChange"
         @update:page-size="handleSizeChange"
       />
@@ -136,6 +136,20 @@ const handleCurrentChange = (val: number) => {
 // 1.使用Pinia进行网络请求的统一管理，不要直接调用网络请求，以此达到业务页面各功能模块的解耦
 // 先获取pinia的systemStore对象
 const systemStore = useSystemStore()
+// 监听systemStore中的actions被执行
+systemStore.$onAction(({ name, after }) => {
+  // after是一个执行完成后的函数，会在成功完成对应的action操作后方才执行
+  after(() => {
+    if (
+      name === 'newPageDataAction' ||
+      name === 'deletePageByIdAction' ||
+      name === 'editPageDataAction'
+    ) {
+      currentPage.value = 1
+      pageSize.value = 10
+    }
+  })
+})
 // 发起pinia的action，请求usersList的数据
 fetchPageListData()
 
@@ -185,8 +199,8 @@ async function handleDeleteClick(id: number) {
     })
     return
   }
-  currentPage.value = 1
-  pageSize.value = 10
+  /*   currentPage.value = 1
+  pageSize.value = 10 */
   fetchPageListData()
   ElMessage({
     message: '删除成功',
@@ -201,6 +215,7 @@ async function createNewUserClick() {
 async function handleEditClick(rowData: any) {
   emit('editBtnClick', rowData)
 }
+
 // 将该函数暴露出去，供其他组件使用
 defineExpose({ fetchPageListData })
 </script>

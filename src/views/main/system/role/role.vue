@@ -65,14 +65,16 @@ const { modalRef, handleNewClick, handleEditClick } = usePageModal(editCallBack)
 // 获取完整的菜单
 const menuValue = ref<number[]>([])
 const mainStore = useMainStore()
-const otherInfo = ref({})
 const { entireMenus } = storeToRefs(mainStore)
 function handleElTreeCheck(data1: any, data2: any) {
   // 将父项和被选中的子项的id拼接成一个数组
   const menuList = [...data2.checkedKeys, ...data2.halfCheckedKeys]
-  otherInfo.value = { menuList }
   // 将otherInfo的值赋值给modalConfig.otherInfo
-  modalConfig.otherInfo = otherInfo.value
+  modalConfig.formItems.forEach((item) => {
+    if (item.prop === 'menuList') {
+      item.initialValue = [...menuList]
+    }
+  })
 }
 // 获取树形组件的ref,完成树形组件的数据回显
 const treeRef = ref<InstanceType<typeof ElTreeSelect>>()
@@ -93,8 +95,6 @@ function editCallBack(itemData: any, type: string) {
     })
   } else {
     nextTick(() => {
-      // 清空用于数据提交时的树状图提交数据
-      modalConfig.otherInfo = []
       // 清空树状图回显的数据
       treeRef.value?.setCheckedKeys([])
       // 清空树状图选择框中的数据

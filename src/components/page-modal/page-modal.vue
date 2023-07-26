@@ -160,10 +160,7 @@ function dialogClose() {
 }
 async function dialogSubmit() {
   let infoData = { ...formData }
-  // 将树状选择器的数据赋值给infoData，用于提交
-  if (props.modalConfig.otherInfo) {
-    infoData = { ...infoData, ...props.modalConfig.otherInfo }
-  }
+
   if (modalType.value === 'create') {
     // 提交创建结果
     const res = await systemStore.newPageDataAction(

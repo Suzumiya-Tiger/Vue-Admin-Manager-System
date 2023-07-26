@@ -40,6 +40,5 @@ const modalConfig: IModalConfig = {
       initialValue: null
     }
   ],
-  otherInfo: null
 }
 export default modalConfig
