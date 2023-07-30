@@ -10,6 +10,9 @@
     "auto-imports.d.ts",
     "components.d.ts"
   ],
+  "exclude": [
+    "commitlint.config.js"
+  ],
   //
   "compilerOptions": {
     "ignoreDeprecations": "5.0",
