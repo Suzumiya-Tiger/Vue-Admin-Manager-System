@@ -39,6 +39,6 @@ const modalConfig: IModalConfig = {
       hidden: true,
       initialValue: null
     }
-  ],
+  ]
 }
 export default modalConfig

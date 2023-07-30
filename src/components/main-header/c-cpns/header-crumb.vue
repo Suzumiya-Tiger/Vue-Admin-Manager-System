@@ -3,7 +3,6 @@
     <el-breadcrumb separator-icon="CaretRight">
       <template v-for="item in breadcrumbs" :key="item.name">
         <el-breadcrumb-item :to="item.path">{{ item.name }}</el-breadcrumb-item>
-
       </template>
     </el-breadcrumb>
   </div>
@@ -25,5 +24,6 @@ const breadcrumbs = computed(() => {
 </script>
 
 <style lang="less" scoped>
-.header-crumb {}
+.header-crumb {
+}
 </style>

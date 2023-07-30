@@ -32,8 +32,14 @@
       <el-checkbox v-model="isRemPwd" label="记住密码" size="large" />
       <el-link type="primary">忘记密码</el-link>
     </div>
-    <el-button :loading="btnLoading" type="primary" class="login-btn" size="large"
-      @click="handleLoginBtnClick">立即登录</el-button>
+    <el-button
+      :loading="btnLoading"
+      type="primary"
+      class="login-btn"
+      size="large"
+      @click="handleLoginBtnClick"
+      >立即登录</el-button
+    >
   </div>
 </template>
 
