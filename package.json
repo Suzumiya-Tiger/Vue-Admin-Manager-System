@@ -18,6 +18,7 @@
     "countup.js": "^2.7.0",
     "dayjs": "^1.11.9",
     "default-passive-events": "^2.0.0",
+    "echarts": "^5.4.3",
     "element-plus": "^2.3.3",
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",

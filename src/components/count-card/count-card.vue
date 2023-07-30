@@ -31,7 +31,6 @@ const props = withDefaults(defineProps<IProps>(), {
   amount: '',
   subtitle: ''
 })
-console.log(props)
 // 创建CountUp的实例对象
 const count1Ref = ref<HTMLElement>()
 const count2Ref = ref<HTMLElement>()
