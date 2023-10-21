@@ -38,9 +38,9 @@
               placeholder="请输入手机号码"
             />
           </el-form-item>
-          <el-form-item label="选择角色" prop="roleId">
+          <el-form-item label="选择角色" prop="role_id">
             <el-select
-              v-model="formData.roleId"
+              v-model="formData.role_id"
               placeholder="请选择角色"
               style="width: 100%"
             >
@@ -89,7 +89,7 @@ let formData = reactive<any>({
   realname: '',
   password: '',
   cellphone: '',
-  roleId: '',
+  role_id: '',
   departmentId: ''
 })
 const editData = ref()
@@ -140,6 +140,7 @@ async function dialogSubmit() {
     ElMessage.success('创建成功')
     emit('create-btn-click')
   } else {
+    console.log(editData)
     const res = await systemStore.editUserDataAction(
       editData.value?.id,
       formData

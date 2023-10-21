@@ -5,7 +5,7 @@ export interface IUser {
   cellphone: number
   enable: number
   departmentId: number
-  roleId: number
+  role_id: number
   createAt: string
   updateAt: string
 }

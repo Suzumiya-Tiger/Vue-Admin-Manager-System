@@ -59,8 +59,8 @@ const accountRules: FormRules = {
   name: [
     { required: true, message: '必须输入帐号信息~', trigger: 'blur' },
     {
-      pattern: /^[a-z0-9]{6,20}$/,
-      message: '必须6~20位数字/字母组成',
+      pattern: /^[a-z0-9]{4,20}$/,
+      message: '必须4~20位数字/字母组成',
       trigger: 'blur'
     }
   ],

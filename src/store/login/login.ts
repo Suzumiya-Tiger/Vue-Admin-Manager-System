@@ -53,7 +53,7 @@ const useLoginStore = defineStore('login', {
       // 4.根据角色请求用户的权限(路由映射表menus)
       // 获取路由映射表(userMenus)
       // 代码写在对应的位置
-      const userMenusResult = await getUserMenuByRoleId(this.userInfo.role.id)
+      const userMenusResult = await getUserMenuByRoleId(this.userInfo.role_id)
       const userMenus = userMenusResult.data
       this.userMenus = [...userMenus]
 

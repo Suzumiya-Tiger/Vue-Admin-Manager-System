@@ -72,7 +72,7 @@ const showGoodsCategoryCount = computed(() => {
   return goodsCategoryCount.value.map((item) => {
     return {
       name: item.name,
-      value: item.goodsCount
+      value: item.count
     }
   })
 })
