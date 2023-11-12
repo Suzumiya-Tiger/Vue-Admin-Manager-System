@@ -22,6 +22,7 @@
             <template #title>
               <el-icon>
                 <!-- 动态组件component 可通过is选取生成对应的组件 -->
+                <!-- < Monitor /> 通过动态组件来进行转化 -->
                 <component :is="item.icon.split('-icon-')[1]"></component>
               </el-icon>
               <span>{{ item.name }}</span>
@@ -57,9 +58,11 @@ defineProps({
 const loginStore = useLoginStore()
 // userMenus是从后端获取的路由映射表
 const userMenus = loginStore.userMenus
-// 2.监听item的点击
+// 获取当前router实例，实现点击跳转
 const router = useRouter()
+// 2.监听item的点击
 function handleItemClick(item: any) {
+  // 从后端获取的路由url必须和前端定义的url一一对应
   const url = item.url
   router.push(url)
 }
@@ -68,6 +71,7 @@ function handleItemClick(item: any) {
 
 // 获取当前路由
 const route = useRoute()
+console.log(route.path)
 // 匹配当前路由获取对应的id
 const defaultActive = computed(() => {
   // 触发computed的关键在于pathMenu的值会根据route.path的变化而变化

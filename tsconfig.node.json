@@ -9,9 +9,9 @@
     "playwright.config.*"
   ],
   "compilerOptions": {
-    // 合成到tsconfig.json的选项
+    // 合成到tsconfig.json的选项，因为tsconfig.json是主要的配置文件
     "composite": true,
-    // 会在Node环境下基于ts进行编译
+    // 意味着includes中对应的配置会在Node环境下基于ts进行编译
     // 对element-plus的API推导产生效果
     "types": ["node", "element-plus/global"],
     // "verbatimModuleSyntax": true,

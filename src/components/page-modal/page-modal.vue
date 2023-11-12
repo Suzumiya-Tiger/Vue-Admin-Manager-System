@@ -139,9 +139,11 @@ function setModalVisible(rowData: any = {}) {
     for (const key in formData) {
       formData[key] = rowData[key]
     }
+    formData.id = rowData.id
     if (rowData.type && rowData.type === 1 && rowData.sort) {
       formData.type = rowData.type
     }
+
     // 将rowData赋值给editData
     editData = reactive(formData)
   } else {
@@ -168,7 +170,7 @@ async function dialogSubmit() {
       infoData
     )
     if (Number(res.code)) {
-      ElMessage.error(res.data)
+      ElMessage.error(res.message)
       return
     }
     ElMessage.success('创建成功')
@@ -184,7 +186,7 @@ async function dialogSubmit() {
       infoData
     )
     if (Number(res.code) || res.code === 'ERR_BAD_REQUEST') {
-      ElMessage.error(res.data || '请求失败')
+      ElMessage.error(res.message || '请求失败')
       return
     }
     ElMessage.success('修改成功')

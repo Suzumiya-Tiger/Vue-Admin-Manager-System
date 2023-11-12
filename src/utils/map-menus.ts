@@ -24,7 +24,7 @@ function loadLocalRoutes() {
   }
   return localRoutes
 }
-// 初次加载时单独定义该全局变量(首次加载的路由)
+// 这是首次加载路由，单独定义并导出该全局变量(首次加载的路由)
 export let firstMenu: any = null
 
 // 这里的功能主要分为两个部分：1.根据路由映射表去匹配正确的路由 2.加载面包屑
@@ -32,16 +32,17 @@ export function mapMenusToRoutes(userMenus: any[]) {
   // 1.先加载本地的路由
   const localRoutes = loadLocalRoutes()
   // 2.根据路由映射表去匹配正确的路由
-  // 先把前端本地路由映射表的路由全部汇总进来，然后再和从后端获取的路由映射表进行匹配
+  // 先把前端本地路由映射表的路由全部汇总进来，然后再从后端获取的路由映射表进行匹配
   const routes: RouteRecordRaw[] = []
   for (const menu of userMenus) {
     for (const submenu of menu.children) {
       const route = localRoutes.find((route) => route.path === submenu.url)
-      // 有可能不存在，所以需要判断
+      /* 实现功能：为顶层的菜单(可以理解为一级面包屑)添加重定向功能，定位到
+      实际存在业务页面的二级菜单，但是只需要执行第一次 */
+      // 可能前后端路由因为权限问题无法对齐(后端路由缺失)，所以需要进行判断
       if (route) {
-        // 给顶层的菜单(可以理解为一级面包屑)添加重定向功能，但是只需要执行第一次即可
-        // 所以需要再添加下文的判断，即只有当routes中不存在menu.url时，才添加重定向功能
-        // 简而言之，就是给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
+        // 给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
+        // 防止点击父级路由时，页面显示空白
         if (!routes.find((item) => item.path === menu.url)) {
           // 下文的作用是为了点击一级面包屑时，跳转到二级面包屑的第一个路由
           routes.push({ path: menu.url, redirect: route.path })

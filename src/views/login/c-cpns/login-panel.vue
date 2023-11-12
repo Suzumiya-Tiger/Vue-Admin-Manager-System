@@ -1,9 +1,9 @@
 <template>
   <div class="login-panel">
-    <h1 class="title">春日后台管理系统</h1>
     <div class="tabs">
-      <el-tabs type="border-card" stretch v-model="activeName">
+      <el-tabs stretch class="loginCard" v-model="activeName">
         <el-tab-pane label="帐号登录" name="account">
+          <!-- 使用指定的具名插槽进行插槽内容自定义 -->
           <template #label>
             <div class="label">
               <el-icon>
@@ -12,19 +12,8 @@
               <span class="text">账号登录</span>
             </div>
           </template>
-
+          <!-- ref和定义的常量ref组件实例相关联 -->
           <pane-account ref="accountRef"></pane-account>
-        </el-tab-pane>
-        <el-tab-pane label="手机登录" name="phone">
-          <template #label>
-            <div class="label">
-              <el-icon>
-                <Cellphone />
-              </el-icon>
-              <span class="text">手机登录</span>
-            </div>
-          </template>
-          <pane-phone></pane-phone>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -47,7 +36,6 @@
 // import type { Cellphone } from '@element-plus/icons-vue/dist/types'
 import { ref, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
-import PanePhone from './panel-phone.vue'
 import { localCache } from '@/utils/cache'
 
 const btnLoading = ref(false)
@@ -55,32 +43,31 @@ const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
 watch(isRemPwd, (newVal) => {
   localCache.setCache('isRemPwd', newVal)
 })
-/*
-typeof PaneAccount 所拿到的是一个构造器，InstanceType要求获取的是一个构造器
-*/
-const accountRef = ref<InstanceType<typeof PaneAccount>>()
-const activeName = ref('account')
 
+// typeof PaneAccount 所拿到的是一个构造器，InstanceType要求获取的是一个构造器
+/* InstanceType<typeof PaneAccount>: InstanceType 是 TypeScript 中的一个内置类型，
+  它用于获取一个类的实例类型。通过 typeof PaneAccount 获取到 PaneAccount 类的类型，
+  然后用 InstanceType 将其转换为 PaneAccount 类的实例类型。 */
+// 通过调用ref可以获取对应的组件实例
+const accountRef = ref<InstanceType<typeof PaneAccount>>()
+const activeName = 'account'
 function handleLoginBtnClick() {
   btnLoading.value = true
-  if (activeName.value === 'account') {
-    // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
-    // 这里需要用可选链，因为不能保证后续的函数一定存在
-    const res = accountRef.value?.loginAction(isRemPwd.value)
-    btnLoading.value = false
-  }
+
+  // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
+  // 这里需要用可选链，因为不能保证后续的函数一定存在
+  accountRef.value?.loginAction(isRemPwd.value)
+  btnLoading.value = false
 }
 </script>
 
 <style lang="less" scoped>
 .login-panel {
+  padding: 90px;
+  border: 1px solid #f5f3f3;
+  border-radius: 8px;
   width: 330px;
   margin-bottom: 150px;
-
-  .title {
-    text-align: center;
-    margin-bottom: 15px;
-  }
 
   .label {
     display: flex;

@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
-// 声明一个模块，用于匹配所有以 ".vue" 结尾的文件
+// 声明一个模块，用于给typescript匹配所有以 ".vue" 结尾的文件
+// 使得typeScript可以正确识别vue文件到底是一个什么类型(写明具体的模块类型)
 declare module '*.vue' {
   // 从 "vue" 中导入 DefineComponent 类型
   import { DefineComponent } from 'vue'

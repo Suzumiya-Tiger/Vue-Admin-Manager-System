@@ -44,6 +44,7 @@ export function newPageData(pageName: string, pageInfo: any) {
   })
 }
 export function editPageData(pageName: string, id: number, pageInfo: any) {
+  console.log(id)
   return hyRequest.patch({
     url: `/${pageName}/${id}`,
     data: pageInfo

@@ -164,6 +164,7 @@ const { pageList, pageTotalCount } = storeToRefs(systemStore)
 // 3.定义函数用于发送网络请求
 // formData可能是空的，这里要进行默认数据判断处理
 function fetchPageListData(formData: any = {}) {
+  console.log(isQuery)
   if (!isQuery) {
     return
   }

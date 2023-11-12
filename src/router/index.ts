@@ -13,6 +13,7 @@ const router = createRouter({
     // 这里需要利用路由导航守卫判断用户是否登录
     {
       path: '/',
+      // 默认路径重定向到/main
       redirect: '/main'
     },
     {

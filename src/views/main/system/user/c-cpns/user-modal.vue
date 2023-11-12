@@ -81,7 +81,7 @@ import { ElForm, ElMessage, type FormRules } from 'element-plus'
 
 const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
 // 获取表单的ref
-const modalForm = ref()
+const modalForm = ref<InstanceType<typeof ElForm>>()
 // 1.定义模态框相关数据
 const dialogVisible = ref(false)
 let formData = reactive<any>({
@@ -108,7 +108,6 @@ const formRules: FormRules = {
 function setModalVisible(rowData: any = {}) {
   // vue3中利用Object.keys()解析reactive对象可以获取对象的所有属性的名称
   const isEmptyRow = Object.keys(rowData).length === 0
-  console.log(isEmptyRow)
   if (!isEmptyRow) {
     modalType.value = 'edit'
     for (const key in formData) {
@@ -130,30 +129,33 @@ function dialogClose() {
   modalForm.value?.resetFields()
 }
 async function dialogSubmit() {
-  if (modalType.value === 'create') {
-    // 提交创建结果
-    const res = await systemStore.createUserDataAction(formData)
-    if (Number(res.code)) {
-      ElMessage.error(res.data)
-      return
+  modalForm.value?.validate(async (valid) => {
+    if (valid) {
+      if (modalType.value === 'create') {
+        // 提交创建结果
+        const res = await systemStore.createUserDataAction(formData)
+        if (Number(res.code)) {
+          ElMessage.error(res.message)
+          return
+        }
+        ElMessage.success('创建成功')
+        emit('create-btn-click')
+      } else {
+        const res = await systemStore.editUserDataAction(
+          editData.value?.id,
+          formData
+        )
+        if (Number(res.code)) {
+          ElMessage.error(res.message)
+          return
+        }
+        ElMessage.success('修改成功')
+        emit('edit-btn-click')
+      }
+      // 将Modal隐藏并且清空表单
+      dialogClose()
     }
-    ElMessage.success('创建成功')
-    emit('create-btn-click')
-  } else {
-    console.log(editData)
-    const res = await systemStore.editUserDataAction(
-      editData.value?.id,
-      formData
-    )
-    if (Number(res.code)) {
-      ElMessage.error(res.data)
-      return
-    }
-    ElMessage.success('修改成功')
-    emit('edit-btn-click')
-  }
-  // 将Modal隐藏并且清空表单
-  dialogClose()
+  })
 }
 
 // 暴露的属性和方法

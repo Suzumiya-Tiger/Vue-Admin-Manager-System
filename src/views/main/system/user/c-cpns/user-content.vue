@@ -39,6 +39,7 @@
         >
 
         <el-table-column label="操作" width="160px">
+          <!-- 通过scope可以获取当前行(row)数据 -->
           <template #default="scope">
             <el-button
               size="small"

@@ -45,7 +45,7 @@ const CACHE_NAME = 'name'
 const CACHE_PASSWORD = 'password'
 
 const labelPosition = ref('right')
-// 1.定义account数据
+// 1.定义account的初始数据，无法从本地获取时则输出为空
 const account = reactive<IAccount>({
   name: localCache.getCache(CACHE_NAME) ?? '',
   password: localCache.getCache(CACHE_PASSWORD) ?? ''
@@ -102,7 +102,7 @@ function loginAction(isRemPwd: Boolean) {
     }
   })
 }
-// 暴露子组件的方法去外部
+// 暴露子组件的方法给父组件使用
 defineExpose({
   loginAction
 })
