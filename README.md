@@ -131,7 +131,7 @@ pnpx husky-init && pnpm install
 
 具体实现可以查看本项目下的husky，里面会在提交git的时候自动写入 `npm run lint`
 
-### 统一风格工具
+### 统一提交规范工具
 
 我们采用了Commitizen进行git提交风格统一工作
 
@@ -161,7 +161,7 @@ pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
  }
 ```
 
-#### 结合commitlint来限制提交
+#### 结合commitlint来约束提交格式
 
 我们可以禁止常规的git commit -m 提交，通过强制推进Commitizen来进行规范化的代码提交，所以我们需要以下工具：
 
@@ -207,9 +207,19 @@ pnpx --no-install commitlint --edit
 
 ```
 
+#### 简化提交命令
+
+通过上述步骤，我们提交项目至git目录的时候，会使得整体代码符合lint规范，同时又符合git提交命令的规范，使得整个提交过程既优雅又规范。
+
+我们还可以直接在 **package.json**里面将`npx cz`命令写入执行命令之中，以后我们直接输入cz就可以轻松进行提交代码说明了：
+
+**package.json**
+
+```
+"commit":"cz"
+```
 
 
-如此一来，我们提交项目至git目录的时候，会使得整体代码符合lint规范，同时又符合git提交命令的规范，使得整个提交过程既优雅又规范。
 
 ## 文件架构目录
 
