@@ -2,10 +2,12 @@
   <div class="content">
     <div class="header">
       <h3 class="title">用户列表</h3>
-      <el-button type="primary" @click="createNewUserClick">新建用户</el-button>
+      <el-button v-if="isCreate" type="primary" @click="createNewUserClick"
+        >新建用户</el-button
+      >
     </div>
     <div class="table">
-      <el-table :data="usersList" border style="width: 100%">
+      <el-table v-if="isQuery" :data="usersList" border style="width: 100%">
         <el-table-column type="selection" width="55" />
         <el-table-column type="index" width="55" label="序号" align="center" />
 
@@ -17,7 +19,7 @@
             <el-button
               size="small"
               plain
-              :type="scope.row.enable ? 'success' : 'danger'"
+              :type="scope.row.enable === 1 ? 'success' : 'danger'"
             >
               {{ tranferEnable(scope.row.enable) }}</el-button
             >
@@ -42,6 +44,7 @@
           <!-- 通过scope可以获取当前行(row)数据 -->
           <template #default="scope">
             <el-button
+              v-if="isUpdate"
               size="small"
               text
               icon="Edit"
@@ -61,6 +64,7 @@
             >
               <template #reference>
                 <el-button
+                  v-if="isDelete"
                   size="small"
                   text
                   icon="Delete"
@@ -97,7 +101,7 @@ import useSystemStore from '@/store/main/system/system'
 import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
 import { ElMessage } from 'element-plus'
-
+import usePermissions from '@/hooks/usePermissions'
 // 定义事件
 const emit = defineEmits(['newBtnClick', 'editBtnClick', 'deleteBtnClick'])
 
@@ -113,6 +117,15 @@ const handleSizeChange = (val: number) => {
 const handleCurrentChange = (val: number) => {
   fetchUserListData()
 }
+// 0.获取是否存在对应的增删改查的权限
+
+const isCreate = usePermissions('system:users:create')
+
+const isDelete = usePermissions('system:users:delete')
+
+const isUpdate = usePermissions('system:users:update')
+
+const isQuery = usePermissions('system:users:query')
 
 // 1.使用Pinia进行网络请求的统一管理，不要直接调用网络请求，以此达到业务页面各功能模块的解耦
 // 先获取pinia的systemStore对象
@@ -131,13 +144,16 @@ const { usersList, usersTotalCount } = storeToRefs(systemStore)
 const tranferEnable = computed(() => {
   // 3.对usersList的数据进行处理，转换成表格需要的数据格式
   return (enable: number) => {
-    return enable ? '启用' : '禁用'
+    return enable === 1 ? '启用' : '禁用'
   }
 })
 
 // 3.定义函数用于发送网络请求
 // formData可能是空的，这里要进行默认数据判断处理
 function fetchUserListData(formData: any = {}) {
+  if (!isQuery) {
+    return
+  }
   // 1.获取offset/size
   const size = pageSize.value
   const offset = (currentPage.value - 1) * size

@@ -71,7 +71,6 @@ function handleItemClick(item: any) {
 
 // 获取当前路由
 const route = useRoute()
-console.log(route.path)
 // 匹配当前路由获取对应的id
 const defaultActive = computed(() => {
   // 触发computed的关键在于pathMenu的值会根据route.path的变化而变化

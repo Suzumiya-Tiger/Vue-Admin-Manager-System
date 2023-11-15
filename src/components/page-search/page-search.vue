@@ -84,7 +84,7 @@ const isQuery = usePermissions(`${props.searchConfig.pageName}:query`)
 // 定义form的数据
 const initialForm: any = {}
 for (const item of props.searchConfig.formItems) {
-  initialForm[item.prop] = item.initialValue
+  initialForm[item.prop] = item.initialValue ?? ''
 }
 const searchForm = reactive(initialForm)
 /* 重置表单 */

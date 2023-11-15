@@ -11,7 +11,7 @@
     <!-- 中间内容的图表 -->
     <el-row :gutter="5">
       <el-col :span="7">
-        <chart-card header="商品销量总揽">
+        <chart-card header="商品销量总览">
           <PieEchart :pieData="showGoodsCategoryCount" />
         </chart-card>
       </el-col>

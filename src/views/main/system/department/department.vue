@@ -42,14 +42,15 @@ import modalConfig from './config/modal.config'
 
 import usePageContent from '@/hooks/usePageContent'
 import usePageModal from '@/hooks/usePageModal'
-/* setup相同的逻辑的抽取：hooks */
-// 点击search,content的操作
+/* 利用setup封装重复方法：利用hooks来把重复的逻辑方法抽取封装，然后解构导入 */
+// 其实本质上类似于vue2的mixins，下面是点击search,content的操作
 const { contentRef, handleQueryClick, handleResetClick } = usePageContent()
 // 点击content,modal的操作
 const { modalRef, handleNewClick, handleEditClick } = usePageModal()
 // 对modalConfig进行操作
 const modalConfigRef = computed(() => {
   const mainStore = useMainStore()
+  // 要对需要导入的options数据进行符合el-select的格式的转换
   const departments = mainStore.entireDepartments.map((item) => {
     return {
       label: item.name,
@@ -57,6 +58,7 @@ const modalConfigRef = computed(() => {
     }
   })
   modalConfig.formItems.forEach((item) => {
+    // 针对select-options组件进行options数据的数据导入
     if (item.prop === 'parentId') {
       item.options?.push(...departments)
     }

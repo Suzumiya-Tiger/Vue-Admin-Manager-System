@@ -113,7 +113,9 @@ function setModalVisible(rowData: any = {}) {
     for (const key in formData) {
       formData[key] = rowData[key]
     }
-    editData.value = rowData
+    formData.id = rowData.id
+    // 将rowData赋值给editData
+    editData.value = reactive(formData)
   } else {
     modalType.value = 'create'
     for (const key in formData) {

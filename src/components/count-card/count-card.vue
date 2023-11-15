@@ -26,8 +26,8 @@ import type { IProps } from './type'
 const props = withDefaults(defineProps<IProps>(), {
   title: '商品总销量',
   tips: '所有商品总销量',
-  number1: 5059595,
-  number2: 5434534,
+  number1: 0,
+  number2: 0,
   amount: '',
   subtitle: ''
 })
