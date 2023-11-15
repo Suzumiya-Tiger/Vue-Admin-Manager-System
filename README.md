@@ -4,6 +4,8 @@
 
 **本文档设有详细的大纲讲解，建议您获取本项目到本地后，使用专用的阅读器打开阅读，使用体验更佳。如果您喜欢本项目，恳请您赏一个star，感激不尽！**
 
+
+
 这是一套结合了应用高阶组件并且对业务功能进行了分类封装的后台管理系统，能够更好地实现快速应用业务数据和快速生成各类业务组件模版，并且集合了关联网络请求的鉴权模块设计、动态适配用户权限来应用不同类型的功能模块
 
 在这个项目中，提供了一套成熟且合理的代码提交流程规范，并且对整体项目进行了更好的封装和解耦，使得功能模块更具有拓展性和通用性，方便了开发者更加合理地进行开发设计
@@ -399,7 +401,11 @@ export default registerIcons
 
 在main.ts导入该文件，利用**app.use(icons)**注册即可完成全局注册
 
-## 登录逻辑的向导分析 
+# 项目的解析和梳理
+
+
+
+## 登录逻辑
 
 通过在**panel-account.vue**之中发送登录信息，获取返回的信息
 
@@ -1057,6 +1063,308 @@ export function mapMenusToRoutes(userMenus: any[]) {
 
 
 
+## 网络请求
+
+本项目网络请求基于axios和TypeScript进行开发，对应网络请求封装均在service文件夹下完成
+
+### 封装和构建axios实例对象
+
+我们要对axios进行一层抽取，避免所有的网络请求都使用同一个axios实例，我们应该利用axios实例单独生成一个我们需要应用的网络请求实例
+
+在**request**目录下的**index.ts**进行基于axios的网络请求实例封装操作，我们会在这里构造全局请求和全局响应成功/失败的拦截器，方便我们对config的参数进行处理
+
+开始讲解之前，我们需要提前理解几个思路(如果后面有所疑惑可以回头看看这段说明)：
+
+- **this.instance**是通过axios所生成的实例。
+- **HYRequest**类的构造器在被调用时会生成这个axios实例。
+- **HYRequest**内部定义了一个**Request**函数，用于二次封装生成的axios实例。
+- **HYRequest**是为了实际网络请求围绕axios的拦截器和请求类型所封装的一个类，用于给外部的网络请求构造调用，生成真正的axios请求实例。
+
+### 全局定义网络请求的拦截器
+
+**request=>index.ts**
+
+```typescript
+import axios from 'axios'
+import type { AxiosInstance } from 'axios'
+import type { HYRequestConfig } from './type'
+
+class HYRequest {
+  instance: AxiosInstance
+
+  // request实例 => axios的实例
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+
+    // 每个instance实例都添加拦截器
+    this.instance.interceptors.request.use(
+      (config) => {
+        // loading/token
+        return config
+      },
+      (err) => {
+        return err
+      }
+    )
+    //...忽略后面的代码
+    }
+}
+```
+
+**AxiosInstance**是axios提供的一个axios实例类型，直接导入即可
+
+**config**参数是所有需要传入的综合对象，我们需要自定义一个 **HYRequestConfig** 类型，这个类型是我们自行封装的，来自于service的类型定义文件：
+
+**type.ts**
+
+```typescript
+export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
+  interceptors?: HYInterceptors<T>
+}
+```
+
+我们会在 **HYRequest** 实例里面封装get、post、delete、patch等等通用的请求方法，这些通用方法依赖于**request**函数，它是一个基于axios构建的网络请求实例的进行二次封装的函数
+
+为什么需要封装一个**request**函数？因为我们在依赖第三方库的时候，为了防止第三方库停止维护或者出现安全漏洞时，我们为了修复这个问题不得不在全局进行大量修改。所以我们应该进行二次封装操作，防止后续的大面积更改
+
+
+
+### 自定义网络请求的指定拦截器(高粒度)
+
+很多时候我们也许并不需要对某些请求进行拦截，所以我们应该在构造实例的时候，动态地选择是否生成拦截器。所以我们可以进一步去请求实例进行更加高粒度的自定义处理
+
+我们通过在**service**的类型声明**type.ts**进行以下操作：
+
+**type.ts**
+
+```typescript
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+
+/* 针对AxiosRequestConfig配置进行扩展 */
+// 通过定义可选属性
+export interface HYInterceptors<T = AxiosResponse> {
+  requestSuccessFn?: (config: AxiosRequestConfig) => AxiosRequestConfig
+  requestFailureFn?: (err: any) => any
+  responseSuccessFn?: (res: T) => T
+  responseFailureFn?: (err: any) => any
+}
+// AxiosRequestConfig是标准的axios实例构造函数中的传参指定类型
+export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
+  interceptors?: HYInterceptors<T>
+}
+
+```
+
+注意看，这里的 **interceptors** 是可选属性，为啥要做成可选的？因为我们需要自定义在实际的网络请求中，我们是否需要拦截器
+
+我们可以再对拦截器的类型进行封装和定义，并将其抽取成一个新的接口类型，命名为 **HYInterceptors**，详情见上面的代码片段。
+
+随后，我们在真正的**HYRequestConfig**实例里面，根据类型声明添加对应的四种拦截器：
+
+**request=>index.ts**
+
+```typescript
+class HYRequest {
+  instance: AxiosInstance
+
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+    //...忽略前面的代码
+    // 针对特定的hyRequest实例添加拦截器
+    this.instance.interceptors.request.use(
+      config.interceptors?.requestSuccessFn,
+      config.interceptors?.requestFailureFn
+    )
+    this.instance.interceptors.response.use(
+      config.interceptors?.responseSuccessFn,
+      config.interceptors?.responseFailureFn
+    )
+    //...忽略后面的代码
+  }
+}
+```
+
+如果需要对基于**HYRequest**类生成的实例对象添加对应的响应拦截，我们只需要在实例对象里面的**request**函数之中添加拦截处理即可。
+
+一旦我们通过**new HYRequest** 构造生成的实例对象有调用拦截器的使用场景，那么我们就需要提前在**HYRequst**类里面的**request**函数中提前定义对应的拦截请求处理，可以通过 ` if (config.interceptors?.requestSuccessFn)` 判断是否有在实例里面添加对应的拦截器，来做对应的处理。
+
+我们通过讲解**requestSuccessFn**，便于你理解如何处理请求拦截器，来看看基于**HYRequest**类生成的实例：
+
+**service=>index.ts 出口文件**
+
+```typescript
+const hyRequest = new HYRequest({
+  baseURL: BASE_URL,
+  timeout: TIME_OUT,
+  // 利用拦截器来导入token等关键信息
+  // 使得每个请求都自动携带token
+  interceptors: {
+    requestSuccessFn: (config) => {
+      const token = localCache.getCache(LOGIN_TOKEN)
+      //类型缩小操作
+      if (config.headers && token) {
+        config.headers.Authorization = token
+      }
+      return config
+    }
+  }
+})
+```
+
+**request=>index.ts**
+
+```typescript
+class HYRequest {
+  instance: AxiosInstance
+
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+    //...忽略前面的代码
+  request<T = any>(config: HYRequestConfig<T>) {
+    // 单次请求的成功拦截处理
+    if (config.interceptors?.requestSuccessFn) {
+      config = config.interceptors.requestSuccessFn(config)
+    }
+  }
+    //...忽略后面的代码
+  }
+}
+```
+
+`config = config.interceptors.requestSuccessFn(config)` 这段代码所表达的含义就是我们在调用拦截器的请求成功函数时，将config(配置)本身作为函数传递进去，这个**config**会在**requestSuccessFn**函数内部被处理完成后，再次被**return**出来，此时我们再重新定义一个新的**config**来接收经过**requestSuccessFn**函数处理完成后的**config**，即可完成操作。
+
+你可以把这套操作理解为“升级焕新”操作，至于你通过 **new HYRequest** 构造生成的**hyRequest**对象内部使用 **requestSuccessFn** 对**config**做什么操作，你可以自行定义。
+
+### 获取responseSuccessFn拦截器
+
+**注意，这个知识点是一个难点！实在无法理解直接跳过，直接应用就好了，本项目已经处理好所有的网络请求了，开箱即用。**
+
+我们不能够直接在**request**函数内部直接调用**responseSuccessFn**，因为这是一个响应成功的操作，但是我们也确实是通过request函数进行统一的二次封装axios网络请求，那么我们该如何解决在**request**函数内部设计响应成功/失败的方法呢？
+
+答案是我们需要另外设计一个**instance**的**request**请求，而且我们要为其封装一个**Promise**请求，作为request请求方法的异步返回结果，才能够正确地获得响应成功的结果。
+
+这里对 `this.instance.request<any, T>(config)`进行一个**Promise**包装处理，在**Promise**内部发起一个网络请求，使得可以异步地获取其返回的结果。
+
+我们在**Promise**的**resolve()**决议之前，进行响应成功的拦截处理。
+
+**request=>index.ts**
+
+```typescript
+class HYRequest {
+  instance: AxiosInstance
+
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+    //...忽略前面的代码
+        request<T = any>(config: HYRequestConfig<T>) {
+    // 封装一个Promise,用于对响应成功的拦截器进行处理
+    return new Promise<T>((resolve, reject) => {
+      this.instance
+        .request<any, T>(config)
+        .then((res) => {
+          // 单次响应的成功拦截处理
+          if (config.interceptors?.responseSuccessFn) {
+            res = config.interceptors.responseSuccessFn(res)
+          }
+          resolve(res)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    }
+      //...忽略后面的代码
+  }
+}
+```
+
+我们之所以要对**Promise**函数定义一个泛型参数**T**，是因为axios真实的返回数据是在**response**的data里面，**response**也就是指 ` this.instance.request` 请求完成后所返回的 **res** ，一旦我们直接在拦截器返回了 `res.data` (我们可以直接在网络请求拿到返回的数据)，我们就无法固定地把axios官方定义的响应类型**responseAxiosResponse**声明给Promise的**res** 参数，见下面的示例代码：
+
+```typescript
+class HYRequest {
+  instance: AxiosInstance
+
+  // request实例 => axios的实例
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+     //...忽略前面的代码
+    this.instance.interceptors.response.use(
+     //axios的官方定义响应类型是responseAxiosResponse，本可以声明给res，但是因为我们在全局响应进行了返回参数的转化，就无法使用了
+      (res) => {
+        return res.data
+      }
+    //...忽略后面的代码
+    )
+  }
+}
+```
+
+所以我们可以直接给**request**声明一个泛型，默认类型为any，使得我们在外部真正使用网络请求 `hyRequest.request`的时候，我们可以传入一个泛型，自定义地声明其 **res** 的类型。
+
+axios源码的针对**request**的完整类型定义见下：
+
+```typescript
+  request<T = any, R = AxiosResponse<T>, D = any>(config: AxiosRequestConfig<D>): Promise<R>;
+```
+
+我们可以自由地将**T**定义成**any**，然后将R自定义为理想的泛型，供我们来自定义**res**(实际上在全局请求响应拦截器中已经被定义为了**res.data**)的声明类型。
+
+```typescript
+class HYRequest {
+  instance: AxiosInstance
+
+  constructor(config: HYRequestConfig) {
+    this.instance = axios.create(config)
+    //...忽略前面的代码
+  	request<T = any>(config: HYRequestConfig<T>) {
+    // 封装一个Promise,用于对响应成功的拦截器进行处理
+    return new Promise<T>((resolve, reject) => {
+      this.instance
+        .request<any, T>(config)
+        .then((res) => {
+      // 这里的res类型即为T(泛型)
+      //...忽略后面的代码
+    }
+      //...忽略后面的代码
+  }
+}
+```
+
+`this.instance.request<any, T>` 是一个泛型函数的调用。这个函数接受两个类型参数。
+
+第一个类型参数 `<any>` 是请求数据的类型。在上述代码，它被设置为 `any`，意味着请求数据可以是任何类型。
+
+第二个类型参数 `<T>` 是响应数据的类型。这个类型参数在函数 `request<T = any>(config: HYRequestConfig<T>)` 中被定义，并且默认值为 `any`。这意味着如果你在调用 `request` 函数时没有提供类型参数，那么响应数据的类型将被认为是 `any`。
+
+所以，`request<any, T>` 的意思是：这是一个发送请求的函数，请求数据的类型可以是任何类型，响应数据的类型是 `T`。
+
+同样的，我们也需要同步 “打磨” 一下网络请求类型定义文件，以满足我们的需求：
+
+```typescript
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+
+/* 针对AxiosRequestConfig配置进行扩展 */
+// 通过定义可选属性
+export interface HYInterceptors<T = AxiosResponse> {
+  requestSuccessFn?: (config: AxiosRequestConfig) => AxiosRequestConfig
+  requestFailureFn?: (err: any) => any
+  responseSuccessFn?: (res: T) => T
+  responseFailureFn?: (err: any) => any
+}
+// AxiosRequestConfig是标准的axios实例构造函数中的传参指定类型
+export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
+  interceptors?: HYInterceptors<T>
+}
+
+```
+
+这里的逻辑可能会有点绕，我们在**request=>index.ts**里面的 `request<T = any>(config: HYRequestConfig<T>) {......`这段代码会把 **T** 传递给 **HYRequestConfig**，而 **HYRequestConfig**会继续把T传递给**HYInterceptors**，从而使我们这里定义 **res**的类型可以成功声明为 **T**。
+
+
+
+恭喜你，如果你看到了这里，并且能成功理解上述网络请求的全部讲解，说明你对axios和TypeScript的理解和应用已经到了炉火纯青的地步，**劲啊！**
+
+
+
 ## 国际化
 
 使用element-plus的**config-provider**组件，对项目进行国际化处理
@@ -1302,13 +1610,23 @@ pnpm run dev
 
 Type-Check, Compile and Minify for Production
 
-```sh
+```shell
 pnpm run build
 ```
 
 Lint with [ESLint](https://eslint.org/)
 
-```sh
+```shell
 pnpm run lint
 ```
 
+Git Commit
+
+```shell
+git add .
+cz
+```
+
+
+
+PS:本项目基于王红元(coderwhy)的精选课程视频进行开发和后续迭代后话，在此特别声明感谢！

@@ -21,16 +21,20 @@ class HYRequest {
   constructor(config: HYRequestConfig) {
     this.instance = axios.create(config)
 
-    // 每个instance实例都添加拦截器
+    /* 1.每个instance实例都添加全局的拦截器 */
+    // 传递的两个参数分别是成功和失败的回调函数
     this.instance.interceptors.request.use(
       (config) => {
-        // loading/token
+        // 全局请求成功的拦截
+        // 我们可以在这里对config的一些配置进行修改，例如headers
         return config
       },
       (err) => {
+        // 全局请求失败的拦截
         return err
       }
     )
+    // 注意一下，这里的res.data已经不是AxiosResponse类型了，而是我们自己定义的泛型T
     this.instance.interceptors.response.use(
       (res) => {
         return res.data
@@ -40,7 +44,7 @@ class HYRequest {
       }
     )
 
-    // 针对特定的hyRequest实例添加拦截器
+    // 针对特定的hyRequest实例添加拦截器，注册到实例上
     this.instance.interceptors.request.use(
       config.interceptors?.requestSuccessFn,
       config.interceptors?.requestFailureFn
@@ -51,15 +55,14 @@ class HYRequest {
     )
   }
 
-  // 封装网络请求的方法
-  // T => IHomeData
+  /* 2.精细化地为需要定制不同拦截器的网络请求进行定制，判断是否需要进行拦截 */
   request<T = any>(config: HYRequestConfig<T>) {
     // 单次请求的成功拦截处理
     if (config.interceptors?.requestSuccessFn) {
       config = config.interceptors.requestSuccessFn(config)
     }
 
-    // 返回Promise
+    // 封装一个Promise,用于对响应成功的拦截器进行处理
     return new Promise<T>((resolve, reject) => {
       this.instance
         .request<any, T>(config)

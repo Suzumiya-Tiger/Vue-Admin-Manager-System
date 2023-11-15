@@ -2,7 +2,7 @@ import {
   getEntireDepartment,
   getEntireMenus,
   getEntireRoles
-} from '@/service/main/main'
+} from '@/service/modules/main/main'
 import { defineStore } from 'pinia'
 interface IMainState {
   entireRoles: any[]

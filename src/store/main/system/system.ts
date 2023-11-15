@@ -7,7 +7,7 @@ import {
   deletePageById,
   newPageData,
   editPageData
-} from '@/service/main/system/system'
+} from '@/service/modules/main/system/system'
 import { defineStore } from 'pinia'
 import type { ISystemState } from './type'
 import { filterEmptyParams } from '@/utils/filter-param'

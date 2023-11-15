@@ -3,7 +3,7 @@ import {
   accountLoginRequest,
   getUserInfoById,
   getUserMenuByRoleId
-} from '@/service/login/login'
+} from '@/service/modules/login/login'
 
 import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'

@@ -4,7 +4,7 @@ import {
   getGoodsCategorySale,
   getGoodsCategoryCollect,
   getGoodsAddressSale
-} from '@/service/main/analysis/analysis'
+} from '@/service/modules/main/analysis/analysis'
 import { defineStore } from 'pinia'
 interface IAnalysisState {
   amountList: any[]
