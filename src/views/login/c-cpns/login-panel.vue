@@ -33,10 +33,9 @@
 </template>
 
 <script setup lang="ts">
-// import type { Cellphone } from '@element-plus/icons-vue/dist/types'
+import { localCache } from '@/utils/cache'
 import { ref, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
-import { localCache } from '@/utils/cache'
 
 const btnLoading = ref(false)
 const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)

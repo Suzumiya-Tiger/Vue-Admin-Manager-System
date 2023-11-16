@@ -1,3 +1,4 @@
+import { localCache } from '@/utils/cache'
 import { defineStore } from 'pinia'
 import {
   accountLoginRequest,
@@ -6,7 +7,7 @@ import {
 } from '@/service/modules/login/login'
 
 import type { IAccount } from '@/types'
-import { localCache } from '@/utils/cache'
+
 import { mapMenusToRoutes, mapMenusToPermissions } from '@/utils/map-menus'
 import router from '@/router'
 import { LOGIN_TOKEN, USERINFO, USERMENUS } from '@/global/constants'

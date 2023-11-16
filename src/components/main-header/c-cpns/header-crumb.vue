@@ -9,9 +9,9 @@
 </template>
 
 <script setup lang="ts">
+import useLoginStore from '@/store/login/login'
 import { mapPathToBreadcrumbs } from '@/utils/map-menus'
 import { useRoute } from 'vue-router'
-import useLoginStore from '@/store/login/login'
 import { computed } from 'vue'
 // 获取当前路由
 const route = useRoute()

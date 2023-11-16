@@ -33,13 +33,14 @@
 </template>
 
 <script setup lang="ts">
+import useLoginStore from '@/store/login/login'
+import { localCache } from '@/utils/cache'
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormRules, ElForm } from 'element-plus'
-import useLoginStore from '@/store/login/login'
+
 // 导入业务页面需要的类型
 import type { IAccount } from '@/types'
-import { localCache } from '@/utils/cache'
 
 const CACHE_NAME = 'name'
 const CACHE_PASSWORD = 'password'

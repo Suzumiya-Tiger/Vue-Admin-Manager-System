@@ -54,12 +54,12 @@
 </template>
 
 <script setup lang="ts">
+import useLoginStore from '@/store/login/login'
+import { localCache } from '@/utils/cache'
 import { useRouter } from 'vue-router'
 import imgUrl from '@/assets/img/avatar.jpg'
 import { LOGIN_TOKEN } from '@/global/constants'
 const router = useRouter()
-import { localCache } from '@/utils/cache'
-import useLoginStore from '@/store/login/login'
 
 function handleExitClick() {
   localCache.removeCache(LOGIN_TOKEN)

@@ -1,7 +1,7 @@
+import useLoginStore from './login/login'
 // 在一个总的出口文件之中导出createPinia函数用于创建pinia
 import { createPinia } from 'pinia'
 import type { App } from 'vue'
-import useLoginStore from './login/login'
 
 const pinia = createPinia()
 /* 通过在main.ts的入口文件里面注册该store，使得加载入口文件时，对应的检测是否登录逻辑也一起生效 */

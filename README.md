@@ -153,7 +153,7 @@ pnpm install commitizen -D
 pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
 ```
 
-3.在**package.json**中进行配置：
+3.在**package.json**中**删除以下配置**：
 
 ```shell
  "config": {
@@ -162,6 +162,16 @@ pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
   }
  }
 ```
+
+然后在根目录创建.czrc,写入以下内容：
+
+```
+{
+    "path": "cz-conventional-changelog"
+}
+```
+
+
 
 #### 结合commitlint来约束提交格式
 
