@@ -4,8 +4,6 @@
 
 **本文档设有详细的大纲讲解，建议您获取本项目到本地后，使用专用的阅读器打开阅读，使用体验更佳。如果您喜欢本项目，恳请您赏一个star，感激不尽！**
 
-
-
 这是一套结合了应用高阶组件并且对业务功能进行了分类封装的后台管理系统，能够更好地实现快速应用业务数据和快速生成各类业务组件模版，并且集合了关联网络请求的鉴权模块设计、动态适配用户权限来应用不同类型的功能模块
 
 在这个项目中，提供了一套成熟且合理的代码提交流程规范，并且对整体项目进行了更好的封装和解耦，使得功能模块更具有拓展性和通用性，方便了开发者更加合理地进行开发设计
@@ -16,15 +14,11 @@
 
 同时，**本项目有配套开发的后端项目**，用于给本项目提供接口和Demo数据，后端项目基于**NodeJS**和**Koa**进行开发，如果有兴趣了解，请移步：https://github.com/Suzumiya-Tiger/LyokoHUB
 
-
-
 **本项目未对用户管理的业务组件进行抽离和封装操作，是为了方便开发者理解/简单使用业务组件来进行开发，其它业务页面均进行了抽离和高度模块化的封装设计，望知悉**
 
 ## 推荐的IDE设置
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
-
-
 
 # 项目开发向导
 
@@ -99,8 +93,6 @@ module.exports = {
 }
 ```
 
-
-
 ## git commit规范
 
 注意，本章节的操作前提在于您已经建立了git仓库
@@ -171,8 +163,6 @@ pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
 }
 ```
 
-
-
 #### 结合commitlint来约束提交格式
 
 我们可以禁止常规的git commit -m 提交，通过强制推进Commitizen来进行规范化的代码提交，所以我们需要以下工具：
@@ -215,7 +205,7 @@ npx husky add .husky/commit-msg "npx --no-install commitlint --edit $1"
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-pnpx --no-install commitlint --edit 
+pnpx --no-install commitlint --edit
 
 ```
 
@@ -223,15 +213,13 @@ pnpx --no-install commitlint --edit
 
 通过上述步骤，我们提交项目至git目录的时候，会使得整体代码符合lint规范，同时又符合git提交命令的规范，使得整个提交过程既优雅又规范。
 
-我们还可以直接在 **package.json**里面将`npx cz`命令写入执行命令之中，以后我们直接输入cz就可以轻松进行提交代码说明了：
+我们还可以直接在 **package.json**里面将 `npx cz`命令写入执行命令之中，以后我们直接输入cz就可以轻松进行提交代码说明了：
 
 **package.json**
 
 ```
 "commit":"cz"
 ```
-
-
 
 ## 文件架构目录
 
@@ -292,8 +280,6 @@ declare module '*.vue' {
 }
 ```
 
-
-
 ### tsconfig.json
 
 tsconfig继承(extends)于vue的tsconfig.web配置，但不建议在这里进行配置的修改
@@ -323,8 +309,6 @@ include配置需要进行ts编译的文件
 ```
 pnpm install element-plus
 ```
-
-
 
 ### 按需引用
 
@@ -390,8 +374,6 @@ import {
     })
 ```
 
-
-
 ### 全局注册图标(icon)
 
 在global文件夹的register-icon.ts进行全局注册操作
@@ -412,8 +394,6 @@ export default registerIcons
 在main.ts导入该文件，利用**app.use(icons)**注册即可完成全局注册
 
 # 项目的解析和梳理
-
-
 
 ## 登录逻辑
 
@@ -469,8 +449,6 @@ export default registerIcons
     }
 ```
 
-
-
 #### 录入token至请求拦截器
 
 我们需要将获取的用户token应用到网络请求的拦截器之中，确保每一次请求发送可以在拦截其中添加对应的token值
@@ -496,8 +474,6 @@ const hyRequest = new HYRequest({
 })
 ```
 
-
-
 ## 权限管理
 
 ### RBAC(role based access control) 基于角色的访问控制
@@ -518,13 +494,9 @@ id/name/token
 
 根据角色获取对应的权限组(菜单权限，功能权限)
 
-
-
 #### 根据角色信息录入菜单路由映射表
 
 见 **登录逻辑的向导分析 **的  [**根据角色信息获取菜单的路由映射表**](#根据角色信息获取菜单的路由映射表)  章节操作
-
-
 
 ### 获取登录用户所有按钮的权限
 
@@ -631,13 +603,13 @@ function fetchPageListData(formData: any = {}) {
 					<-- ...省略部分代码 -->
                   >编辑
                 </el-button>
-   
+
                     <el-button
                       v-if="isDelete"
          			<-- ...省略部分代码 -->
                       >删除
                 </el-button>
-     
+
 ```
 
 同时需要注意，在编辑/新建角色、菜单的数据之后，**要对全局的权限和路由重新进行更新操作**，此处不再详述，相关操作写在了 **system.ts** 里面
@@ -679,18 +651,15 @@ function fetchPageListData(formData: any = {}) {
 
 ### 应用路由映射表
 
-我们会提前将业务组件的路由做一个按需引入，然后导出该业务组件的详细路由信息，根据后端返回的菜单路由映射表进行匹配，动态地导入菜单 
+我们会提前将业务组件的路由做一个按需引入，然后导出该业务组件的详细路由信息，根据后端返回的菜单路由映射表进行匹配，动态地导入菜单
 
 我们会在 **loginAccountAction**里面完成动态引入匹配的菜单路由对象
 
 具体步骤如下：
 
 - 获取后端返回的路由菜单映射表，将其存入**userMenus**
-
 - 从该路由菜单映射表获取所有后端返回的路由对象，存在一个数组之中
-
 - 前端项目中(本项目)，将所有的路由对象一个个存在独立的文件当中
-
 - 举例说明：
 
   ```typescript
@@ -701,9 +670,8 @@ function fetchPageListData(formData: any = {}) {
     component: category,
     children: []
   }
-  
-  ```
 
+  ```
 - 从文件中先将所有前端写好路由对象先存档到一个数组里面，准备匹配后端返回的路由菜单映射表
 
   我们通过**map-menus**中的工具类函数 **loadLocalRoutes** 来完成前端所有的路由对象的遍历存档，并将遍历处理后的路由对象数组暴露出去
@@ -731,9 +699,6 @@ function fetchPageListData(formData: any = {}) {
     return localRoutes
   }
   ```
-  
-  
-  
 - 根据后端的路由菜单映射表去意义匹配，再通过**router.addRoute('main',匹配路由)**加入到路由表中
 
   ```typescript
@@ -766,7 +731,6 @@ function fetchPageListData(formData: any = {}) {
     return routes
   }
   ```
-
 - 获取到匹配的路由之后，我们再在**login.ts**之中通过调用 **mapMenusToRoutes** 并传入一个后端返回的映射路由表，完成前后端路由鉴权匹配，并将其正式添加进前端路由router之中：
 
   ```typescript
@@ -777,6 +741,8 @@ function fetchPageListData(formData: any = {}) {
           })
 
 
+
+  ```
 
 当然请注意，在 **login.ts**里面，要针对已登录和未登录的场景分别进行路由导入处理:
 
@@ -821,8 +787,6 @@ function registerStore(app: App<Element>) {
 export default registerStore
 ```
 
-
-
 是否已经登录的验证逻辑，以及已登录的操作逻辑写在 **login.ts**之中：
 
 **login.ts**
@@ -865,8 +829,6 @@ export default registerStore
   loginStore.loadLocalCacheAction()
 ```
 
-
-
 ### 正确跳转首次加载路由
 
 我们获取到前后端匹配完成的路由映射表后，第一个跳转的路由应该是该路由映射表的第一条路由对象：
@@ -877,7 +839,7 @@ export function mapMenusToRoutes(userMenus: any[]) {
 
 // 这是首次加载路由，单独定义并导出该全局变量(首次加载的路由)
 export let firstMenu: any = null
-export function mapMenusToRoutes(userMenus: any[]) { 
+export function mapMenusToRoutes(userMenus: any[]) {
 // 记录第一个被匹配到的路由映射对象，即从后端获取的路由映射表列表中选取第一个路由映射表
       if (!firstMenu && route) firstMenu = submenu
 	}
@@ -902,8 +864,6 @@ router.beforeEach((to, from) => {
   }
 })
 ```
-
-
 
 ## 菜单管理
 
@@ -963,8 +923,6 @@ export function mapPathToMenu(path: string, userMenus: any[]) {
   }
 }
 ```
-
-
 
 ### 面包屑导航
 
@@ -1029,8 +987,6 @@ const breadcrumbs = computed(() => {
 
 ```
 
-
-
 ### 点击父路由的重定向
 
 为了防止在面包屑和菜单栏点击父路由时的跳转出现空白页面或错误页面，我们需要为点击父级路由增加一个重定向功能
@@ -1070,8 +1026,6 @@ export function mapMenusToRoutes(userMenus: any[]) {
 ![image-20231110123313362](./README.assets/image-20231110123313362.png)
 
 具体业务页面的默认active路径代码不做展示，用computed进行动态获取active路径即可
-
-
 
 ## 网络请求
 
@@ -1136,8 +1090,6 @@ export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
 我们会在 **HYRequest** 实例里面封装get、post、delete、patch等等通用的请求方法，这些通用方法依赖于**request**函数，它是一个基于axios构建的网络请求实例的进行二次封装的函数
 
 为什么需要封装一个**request**函数？因为我们在依赖第三方库的时候，为了防止第三方库停止维护或者出现安全漏洞时，我们为了修复这个问题不得不在全局进行大量修改。所以我们应该进行二次封装操作，防止后续的大面积更改
-
-
 
 ### 自定义网络请求的指定拦截器(高粒度)
 
@@ -1369,11 +1321,7 @@ export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
 
 这里的逻辑可能会有点绕，我们在**request=>index.ts**里面的 `request<T = any>(config: HYRequestConfig<T>) {......`这段代码会把 **T** 传递给 **HYRequestConfig**，而 **HYRequestConfig**会继续把T传递给**HYInterceptors**，从而使我们这里定义 **res**的类型可以成功声明为 **T**。
 
-
-
 恭喜你，如果你看到了这里，并且能成功理解上述网络请求的全部讲解，说明你对axios和TypeScript的理解和应用已经到了炉火纯青的地步，**劲啊！**
-
-
 
 ## 国际化
 
@@ -1404,8 +1352,6 @@ const locale = ref(zhCn)
 
 ```
 
-
-
 ## 疑难点说明
 
 ### 角色管理-树状组件
@@ -1431,8 +1377,6 @@ const locale = ref(zhCn)
 **nextTick()**到底是宏任务还是微任务？Vue2中**nextTick()**的定义是反复变化的，但在Vue3中**nextTick()**确定是一个微任务
 
 关于什么是tick，建议结合Vue3的官方文档，理解一下宏任务和微任务的原理，关于nextTick的Vue3文档解释：https://cn.vuejs.org/api/general.html#nexttick
-
-
 
 ### Echart组件封装逻辑
 
@@ -1602,9 +1546,7 @@ const showGoodsCategoryCount = computed(() => {
 </script>
 ```
 
-
-
-****
+---
 
 ## 项目启动
 
@@ -1637,6 +1579,4 @@ git add .
 cz
 ```
 
-
-
-PS:本项目基于王红元(coderwhy)的精选课程视频进行开发和后续迭代后话，在此特别声明感谢！
+PS:本项目基于王红元(coderwhy)的精选课程进行开发和后续迭代，在此特别声明感谢！
