@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts" name="department">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import useMainStore from '@/store/main/main'
 
 // 1.导入组件(vueComponent)

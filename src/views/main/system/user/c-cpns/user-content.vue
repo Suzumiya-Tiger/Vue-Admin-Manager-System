@@ -111,10 +111,10 @@ const background = ref(false)
 const disabled = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
-const handleSizeChange = (val: number) => {
+const handleSizeChange = () => {
   fetchUserListData()
 }
-const handleCurrentChange = (val: number) => {
+const handleCurrentChange = () => {
   fetchUserListData()
 }
 // 0.获取是否存在对应的增删改查的权限

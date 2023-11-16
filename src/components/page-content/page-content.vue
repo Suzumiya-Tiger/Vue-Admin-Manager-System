@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import useSystemStore from '@/store/main/system/system'
 import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
@@ -126,10 +126,10 @@ const background = ref(false)
 const disabled = ref(false)
 const currentPage = ref(1)
 const pageSize = ref(10)
-const handleSizeChange = (val: number) => {
+const handleSizeChange = () => {
   fetchPageListData()
 }
-const handleCurrentChange = (val: number) => {
+const handleCurrentChange = () => {
   fetchPageListData()
 }
 

@@ -10,10 +10,6 @@
 interface IProps {
   header?: string
 }
-
-const props = withDefaults(defineProps<IProps>(), {
-  header: '卡片头部标题'
-})
 </script>
 
 <style lang="less" scoped>

@@ -5,7 +5,7 @@ import type { EChartsOption } from 'echarts'
 import chinaJson from '../data/china.json'
 echarts.registerMap('china', chinaJson as any)
 
-export function useEcharts(domEl: HTMLElement, theme = 'light') {
+export function useEcharts(domEl: HTMLElement) {
   // 1.初始化echarts实例，传入domEl用于渲染
   const echartInstance = echarts.init(domEl, 'light', {
     renderer: 'canvas',

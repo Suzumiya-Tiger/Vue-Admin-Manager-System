@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts" name="menu">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 
 import useSystemStore from '@/store/main/system/system'
 

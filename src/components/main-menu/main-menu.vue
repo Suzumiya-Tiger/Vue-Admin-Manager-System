@@ -45,7 +45,7 @@
 <script setup lang="ts">
 import useLoginStore from '@/store/login/login'
 import { useRouter, useRoute } from 'vue-router'
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { mapPathToMenu } from '@/utils/map-menus'
 // 0 接收props
 defineProps({
