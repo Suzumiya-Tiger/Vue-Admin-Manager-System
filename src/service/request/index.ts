@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
-import type { HYRequestConfig } from './type'
+import type { HDSRequestConfig, HYRequestConfig } from './type'
 
 // 拦截器: 蒙版Loading/token/修改配置
 
@@ -18,7 +18,7 @@ class HYRequest {
   instance: AxiosInstance
 
   // request实例 => axios的实例
-  constructor(config: HYRequestConfig) {
+  constructor(config: HDSRequestConfig) {
     this.instance = axios.create(config)
 
     /* 1.每个instance实例都添加全局的拦截器 */
