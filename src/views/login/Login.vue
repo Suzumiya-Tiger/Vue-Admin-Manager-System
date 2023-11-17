@@ -2,6 +2,7 @@
   <div class="login">
     <h1 class="title">春日后台管理系统</h1>
     <login-panel />
+    <p>用户名：haruhi 密码：123456</p>
   </div>
 </template>
 

@@ -16,6 +16,12 @@
 
 **本项目未对用户管理的业务组件进行抽离和封装操作，是为了方便开发者理解/简单使用业务组件来进行开发，其它业务页面均进行了抽离和高度模块化的封装设计，望知悉**
 
+在线演示地址：
+
+[http://139.199.212.233/]: 	"Vue3_CMS"
+
+
+
 ## 推荐的IDE设置
 
 [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
@@ -670,7 +676,7 @@ function fetchPageListData(formData: any = {}) {
     component: category,
     children: []
   }
-
+  
   ```
 - 从文件中先将所有前端写好路由对象先存档到一个数组里面，准备匹配后端返回的路由菜单映射表
 
@@ -765,7 +771,7 @@ app.use(store)
 // 在login页面登录的时候，app.use(router)的执行顺序并不重要，因为login页面并没有路由守卫，
 // 也用不上对应的路由映射表，所以不会出现路由守卫失效的情况
 app.use(router)
-```
+  ```
 
 在store的出口文件之中加载本地的数据：
 

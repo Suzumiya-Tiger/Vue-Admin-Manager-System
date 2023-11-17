@@ -66,7 +66,7 @@ function handleLoginBtnClick() {
   border: 1px solid #f5f3f3;
   border-radius: 8px;
   width: 330px;
-  margin-bottom: 150px;
+  margin-bottom: 30px;
 
   .label {
     display: flex;

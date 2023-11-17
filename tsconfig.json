@@ -23,7 +23,8 @@
         "./src/*"
       ]
     },
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
   },
   "references": [
     {

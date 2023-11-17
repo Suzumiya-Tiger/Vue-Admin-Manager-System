@@ -1,6 +1,8 @@
 import type { IModalConfig } from '@/components/page-modal/type'
 
 const modalConfig: IModalConfig = {
+  customFormItemName: 'menuList',
+  propSlotData: [],
   pageName: 'role',
   header: {
     newTitle: '新建角色',

@@ -17,6 +17,8 @@ export interface formItemType {
 }
 
 export interface IModalConfig {
+  customFormItemName?: string
+  propSlotData?: any[]
   pageName: string
   width?: string
   header: {

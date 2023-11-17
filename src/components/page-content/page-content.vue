@@ -108,7 +108,7 @@ import type { IProps } from './type'
 import usePermissions from '@/hooks/usePermissions'
 const props = defineProps<IProps>()
 // 定义事件
-const emit = defineEmits(['newBtnClick', 'editBtnClick', 'deleteBtnClick'])
+const emit = defineEmits(['newBtnClick', 'editBtnClick'])
 
 // 0.获取是否存在对应的增删改查的权限
 
@@ -194,11 +194,12 @@ async function handleDeleteClick(id: number) {
   )
   if (Number(delRes.code)) {
     ElMessage({
-      message: delRes.data,
+      message: delRes.message,
       type: 'error'
     })
     return
   }
+  fetchPageListData()
   ElMessage({
     message: '删除成功',
     type: 'success'

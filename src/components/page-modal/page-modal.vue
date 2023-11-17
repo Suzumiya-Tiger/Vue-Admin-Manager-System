@@ -1,6 +1,7 @@
 <template>
   <div class="modal">
     <el-dialog
+      @closed="dialogClose"
       v-model="dialogVisible"
       :title="
         modalType === 'create'
@@ -28,6 +29,7 @@
                   :placeholder="item.placeholder"
                 ></el-input>
               </template>
+              <!-- 自定义组件 -->
               <template #default v-else-if="item.type === 'custom'">
                 <slot :name="item.slotName"></slot>
               </template>
@@ -81,7 +83,6 @@
 import { computed, reactive, ref } from 'vue'
 import type { IModalProps, formItemType } from './type'
 import useSystemStore from '@/store/main/system/system'
-import deepCopyReactive from '@/utils/deepCopyReactive'
 import { ElForm, ElMessage, type FormRules } from 'element-plus'
 const isShow = computed(() => {
   return (item: formItemType) => {
@@ -97,15 +98,19 @@ const isShow = computed(() => {
 const props = defineProps<IModalProps>()
 const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
 // 获取表单的ref
-const modalForm = ref()
+const modalForm = ref<InstanceType<typeof ElForm>>()
+
 // 1.定义模态框相关数据
 const dialogVisible = ref(false)
 // 定义form的数据
-const initialForm: any = reactive({})
+const formData = reactive({ id: null, type: null })
+
 // 定义form的校验规则
 const formRules: FormRules = {}
 for (const item of props.modalConfig.formItems) {
-  initialForm[item.prop] = item.initialValue ?? null
+  // 初始化initialForm的数据
+  formData[item.prop] = item.initialValue ?? null
+  /* 格式化formRules的数据 */
   item.required
     ? (formRules[item.label] = [
         {
@@ -116,10 +121,8 @@ for (const item of props.modalConfig.formItems) {
       ])
     : null
 }
-// 利用深拷贝将initialForm的值赋值给formData
-const formData = deepCopyReactive(initialForm)
-let editData = reactive(formData)
 
+// 利用深拷贝将initialForm的值赋值给formData
 // 定义编辑/新建的区分状态
 const modalType = ref('')
 // 获取mainStore中的数据
@@ -143,26 +146,31 @@ function setModalVisible(rowData: any = {}) {
     if (rowData.type && rowData.type === 1 && rowData.sort) {
       formData.type = rowData.type
     }
-
     // 将rowData赋值给editData
-    editData = reactive(formData)
   } else {
     modalType.value = 'create'
     // 对新建的数据进行初始化
-    for (const key in formData) {
-      formData[key] = initialForm[key]
-    }
   }
   dialogVisible.value = true
 }
 function dialogClose() {
   // 将Modal隐藏并且清空表单
   dialogVisible.value = false
-  modalForm.value?.resetFields()
+  for (const item of props.modalConfig.formItems) {
+    // 初始化initialForm的数据
+    formData[item.prop] = item.initialValue ?? null
+  }
+  modalForm.value?.clearValidate()
 }
 async function dialogSubmit() {
   let infoData = { ...formData }
-
+  if (props.modalConfig.customFormItemName) {
+    if (Array.isArray(props.modalConfig.propSlotData)) {
+      infoData[props.modalConfig.customFormItemName] = [
+        ...props.modalConfig.propSlotData
+      ]
+    }
+  }
   if (modalType.value === 'create') {
     // 提交创建结果
     const res = await systemStore.newPageDataAction(
@@ -182,7 +190,7 @@ async function dialogSubmit() {
     }
     const res = await systemStore.editPageDataAction(
       props.modalConfig.pageName,
-      editData.id ?? '',
+      formData.id ?? 0,
       infoData
     )
     if (Number(res.code) || res.code === 'ERR_BAD_REQUEST') {
