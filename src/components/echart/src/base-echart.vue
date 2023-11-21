@@ -34,7 +34,7 @@ onMounted(() => {
 <style lang="less" scoped>
 .base-echart {
   .echart {
-    height: 40vh;
+    height: 45vh;
   }
 }
 </style>

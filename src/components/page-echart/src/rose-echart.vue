@@ -16,8 +16,8 @@ const props = defineProps<IProps>()
 const option = computed<EChartsOption>(() => {
   return {
     title: {
-      text: 'Nightingale Chart',
-      subtext: 'Fake Data',
+      text: '商品销量比例',
+      subtext: '',
       left: 'center'
     },
     tooltip: {
@@ -25,8 +25,12 @@ const option = computed<EChartsOption>(() => {
       formatter: '{a} <br/>{b} : {c} ({d}%)'
     },
     legend: {
-      left: 'center',
-      top: 'bottom',
+      orient: 'vertical',
+      bottom: 'bottom',
+      show: true,
+      left: '5px',
+      itemWidth: 10,
+      itemHeight: 4,
       data: [
         'rose1',
         'rose2',
@@ -52,8 +56,8 @@ const option = computed<EChartsOption>(() => {
         name: 'Radius Mode',
         type: 'pie',
         radius: [20, 140],
-        center: ['25%', '50%'],
-        bottom: '-15%',
+        center: ['50%', '70%'],
+        bottom: '15%',
         roseType: 'radius',
         itemStyle: {
           borderRadius: 5

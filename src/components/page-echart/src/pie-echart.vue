@@ -16,8 +16,8 @@ const props = defineProps<IProps>()
 const option = computed<EChartsOption>(() => {
   return {
     title: {
-      text: 'Referer of a Website',
-      subtext: 'Fake Data',
+      text: '商品销量总览',
+      subtext: '',
       left: 'center'
     },
     tooltip: {
@@ -25,8 +25,13 @@ const option = computed<EChartsOption>(() => {
     },
     legend: {
       orient: 'vertical',
-      left: 'left'
+      bottom: 'bottom',
+      show: true,
+      left: '5px',
+      itemWidth: 10,
+      itemHeight: 4
     },
+
     series: [
       {
         name: 'Access From',

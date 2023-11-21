@@ -24,7 +24,7 @@
 
 # 项目开发向导
 
-## 代码规范配置
+## 代码规范配置(选配，非必须)
 
 ### 1.使用editorConfig统一配置
 
@@ -95,7 +95,7 @@ module.exports = {
 }
 ```
 
-## git commit规范
+## git commit规范(选配，非必须)
 
 注意，本章节的操作前提在于您已经建立了git仓库
 
@@ -672,7 +672,7 @@ function fetchPageListData(formData: any = {}) {
     component: category,
     children: []
   }
-
+  
   ```
 - 从文件中先将所有前端写好路由对象先存档到一个数组里面，准备匹配后端返回的路由菜单映射表
 
@@ -767,7 +767,7 @@ app.use(store)
 // 在login页面登录的时候，app.use(router)的执行顺序并不重要，因为login页面并没有路由守卫，
 // 也用不上对应的路由映射表，所以不会出现路由守卫失效的情况
 app.use(router)
-```
+  ```
 
 在store的出口文件之中加载本地的数据：
 

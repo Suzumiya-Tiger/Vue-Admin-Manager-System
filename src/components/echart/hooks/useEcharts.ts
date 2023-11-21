@@ -8,8 +8,7 @@ echarts.registerMap('china', chinaJson as any)
 export function useEcharts(domEl: HTMLElement) {
   // 1.初始化echarts实例，传入domEl用于渲染
   const echartInstance = echarts.init(domEl, 'light', {
-    renderer: 'canvas',
-    width: 600
+    renderer: 'canvas'
   })
 
   // 设置options函数，使得options被外部调用，实现实例的options更新
