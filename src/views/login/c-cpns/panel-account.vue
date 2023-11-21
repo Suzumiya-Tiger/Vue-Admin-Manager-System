@@ -48,8 +48,8 @@ const CACHE_PASSWORD = 'password'
 const labelPosition = ref('right')
 // 1.定义account的初始数据，无法从本地获取时则输出为空
 const account = reactive<IAccount>({
-  name: localCache.getCache(CACHE_NAME) ?? '',
-  password: localCache.getCache(CACHE_PASSWORD) ?? ''
+  name: localCache.getCache(CACHE_NAME) ?? 'haruhi',
+  password: localCache.getCache(CACHE_PASSWORD) ?? '123456'
 })
 // 引入login的pinia状态(激活该实例使其内部方法可以被调用)
 const loginStore = useLoginStore()

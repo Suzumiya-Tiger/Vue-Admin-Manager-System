@@ -1,6 +1,7 @@
 <template>
   <div class="login-panel">
     <div class="tabs">
+      <h1 class="title">Lyoko后台管理系统</h1>
       <el-tabs stretch class="loginCard" v-model="activeName">
         <el-tab-pane label="帐号登录" name="account">
           <!-- 使用指定的具名插槽进行插槽内容自定义 -->
@@ -29,6 +30,7 @@
       @click="handleLoginBtnClick"
       >立即登录</el-button
     >
+    <p class="tips">用户名：haruhi 密码：123456</p>
   </div>
 </template>
 
@@ -67,6 +69,7 @@ function handleLoginBtnClick() {
   border-radius: 8px;
   width: 330px;
   margin-bottom: 30px;
+  background-color: #f5f3f3;
 
   .label {
     display: flex;
@@ -77,7 +80,16 @@ function handleLoginBtnClick() {
       margin-left: 5px;
     }
   }
-
+  .title {
+    font-weight: normal;
+    font-family: 'Microsoft YaHei', Arial, Helvetica, sans-serif;
+    text-align: center;
+    margin-bottom: 55px;
+  }
+  .tips {
+    padding-top: 30px;
+    text-align: center;
+  }
   .control-account {
     margin-top: 12px;
     display: flex;

@@ -24,6 +24,8 @@
     "lodash": "^4.17.21",
     "normalize.css": "^8.0.1",
     "pinia": "^2.0.34",
+    "three": "^0.158.0",
+    "vanta": "^0.5.24",
     "vue": "^3.3.4",
     "vue-router": "^4.1.6"
   },
@@ -32,6 +34,7 @@
     "@commitlint/config-conventional": "^18.4.2",
     "@rushstack/eslint-patch": "^1.2.0",
     "@types/node": "^18.14.2",
+    "@types/three": "^0.158.2",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vue/eslint-config-prettier": "^7.1.0",
     "@vue/eslint-config-typescript": "^11.0.2",

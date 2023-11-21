@@ -3,7 +3,7 @@
     <!-- logo -->
     <div class="logo">
       <img class="img" src="@/assets/img/logo.svg" alt="" />
-      <h2 v-show="!isFold" class="title">春日管理系统</h2>
+      <h2 v-show="!isFold" class="title">Lyoko管理系统</h2>
     </div>
     <div class="menu">
       <!-- menu -->
