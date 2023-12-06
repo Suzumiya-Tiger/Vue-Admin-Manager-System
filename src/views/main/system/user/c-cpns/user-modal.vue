@@ -73,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, shallowRef } from 'vue'
 import { storeToRefs } from 'pinia'
 import useMainStore from '@/store/main/main'
 import useSystemStore from '@/store/main/system/system'
@@ -83,7 +83,7 @@ const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
 // 获取表单的ref
 const modalForm = ref<InstanceType<typeof ElForm>>()
 // 1.定义模态框相关数据
-const dialogVisible = ref(false)
+const dialogVisible = shallowRef(false)
 let formData = reactive<any>({
   name: '',
   realname: '',
@@ -92,9 +92,9 @@ let formData = reactive<any>({
   role_id: '',
   departmentId: ''
 })
-const editData = ref()
+const editData = shallowRef()
 // 定义编辑/新建的区分状态
-const modalType = ref('')
+const modalType = shallowRef('')
 // 获取mainStore中的数据
 const mainStore = useMainStore()
 // 获取systemStore中的数据

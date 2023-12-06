@@ -11,20 +11,26 @@ import {
 import { defineStore } from 'pinia'
 import type { ISystemState } from './type'
 import { filterEmptyParams } from '@/utils/filter-param'
-import useMainStore from '../main'
 const useSystemStore = defineStore('system', {
   state: (): ISystemState => ({
     usersList: [],
     usersTotalCount: 0,
     pageList: [],
-    pageTotalCount: 0
+    pageTotalCount: 0,
+    // 是否初次加载，如果是则加载fetchEntireDataAction
+    isFirstLoad: true
   }),
   actions: {
+    // 变更是否初次刷新页面状态
+    async changeFirstLoad() {
+      this.isFirstLoad = !this.isFirstLoad
+    },
     // 获取用户列表
     async postUsersListAction(queryInfo: any) {
       const usersListResult = await postUserListData(
         filterEmptyParams(queryInfo)
       )
+
       const { list, totalCount } = usersListResult.data
       this.usersTotalCount = totalCount
       this.usersList = list
@@ -54,24 +60,17 @@ const useSystemStore = defineStore('system', {
         pageName,
         filterEmptyParams(queryInfo)
       )
+
       const { data } = pageListResult
       this.pageList = data.list
       this.pageTotalCount = data ?? data.length
     },
     async deletePageByIdAction(pageName: string, id: number) {
       const deleteResult = await deletePageById(pageName, id)
-
-      // 获取完整的全局应用数据
-      const mainStore = useMainStore()
-      mainStore.fetchEntireDataAction()
       return deleteResult
     },
     async newPageDataAction(pageName: string, pageInfo: any) {
       const newResult = await newPageData(pageName, filterEmptyParams(pageInfo))
-
-      // 获取完整的全局应用数据
-      const mainStore = useMainStore()
-      mainStore.fetchEntireDataAction()
       return newResult
     },
     async editPageDataAction(pageName: string, id: number, pageInfo: any) {
@@ -80,9 +79,6 @@ const useSystemStore = defineStore('system', {
         id,
         filterEmptyParams(pageInfo)
       )
-      // 获取完整的全局应用数据
-      const mainStore = useMainStore()
-      mainStore.fetchEntireDataAction()
       return editResult
     }
   }

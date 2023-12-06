@@ -80,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, shallowRef } from 'vue'
 import type { IModalProps, formItemType } from './type'
 import useSystemStore from '@/store/main/system/system'
 import { ElForm, ElMessage, type FormRules } from 'element-plus'
@@ -101,7 +101,7 @@ const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
 const modalForm = ref<InstanceType<typeof ElForm>>()
 
 // 1.定义模态框相关数据
-const dialogVisible = ref(false)
+const dialogVisible = shallowRef(false)
 // 定义form的数据
 const formData = reactive({ id: null, type: null })
 
@@ -124,7 +124,7 @@ for (const item of props.modalConfig.formItems) {
 
 // 利用深拷贝将initialForm的值赋值给formData
 // 定义编辑/新建的区分状态
-const modalType = ref('')
+const modalType = shallowRef('')
 // 获取mainStore中的数据
 // const mainStore = useMainStore()
 // 获取systemStore中的数据
@@ -181,6 +181,8 @@ async function dialogSubmit() {
       ElMessage.error(res.message)
       return
     }
+    const useStore = useSystemStore()
+    useStore.changeFirstLoad()
     ElMessage.success('创建成功')
     emit('create-btn-click')
   } else if (modalType.value === 'edit') {
@@ -193,10 +195,12 @@ async function dialogSubmit() {
       formData.id ?? 0,
       infoData
     )
-    if (Number(res.code) || res.code === 'ERR_BAD_REQUEST') {
+    if (res.code) {
       ElMessage.error(res.message || '请求失败')
       return
     }
+    const useStore = useSystemStore()
+    useStore.changeFirstLoad()
     ElMessage.success('修改成功')
     emit('edit-btn-click')
   }

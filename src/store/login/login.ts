@@ -12,7 +12,7 @@ import { mapMenusToRoutes, mapMenusToPermissions } from '@/utils/map-menus'
 import router from '@/router'
 import { LOGIN_TOKEN, USERINFO, USERMENUS } from '@/global/constants'
 // import type { RouteRecordRaw } from 'vue-router'
-import useMainStore from '../main/main'
+// import useMainStore from '../main/main'
 interface ILoginState {
   token: string
   // 也可以利用JSON TO TYPESCRIPT网站转换一下数据
@@ -63,8 +63,8 @@ const useLoginStore = defineStore('login', {
       localCache.setCache(USERINFO, userInfo)
       localCache.setCache(USERMENUS, userMenus)
       // 4.请求所有的roles/departments数据
-      const mainStore = useMainStore()
-      mainStore.fetchEntireDataAction()
+      // const mainStore = useMainStore()
+      // mainStore.fetchEntireDataAction()
 
       // (重要)获取登录用户的所有按钮的权限
       const permissionList = mapMenusToPermissions(userMenus)
@@ -92,8 +92,8 @@ const useLoginStore = defineStore('login', {
         this.userInfo = userInfo
         this.userMenus = userMenus
         // 1.请求所有的roles/departments数据
-        const mainStore = useMainStore()
-        mainStore.fetchEntireDataAction()
+        // const mainStore = useMainStore()
+        // mainStore.fetchEntireDataAction()
         // (重要)获取登录用户的所有按钮的权限
         const permissionList = mapMenusToPermissions(userMenus)
         this.permissions = [...permissionList]

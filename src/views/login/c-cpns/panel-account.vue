@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import useLoginStore from '@/store/login/login'
 import { localCache } from '@/utils/cache'
-import { reactive, ref } from 'vue'
+import { reactive, ref, shallowRef } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormRules, ElForm } from 'element-plus'
 
@@ -45,7 +45,7 @@ import type { IAccount } from '@/types'
 const CACHE_NAME = 'name'
 const CACHE_PASSWORD = 'password'
 
-const labelPosition = ref('right')
+const labelPosition = shallowRef('right')
 // 1.定义account的初始数据，无法从本地获取时则输出为空
 const account = reactive<IAccount>({
   name: localCache.getCache(CACHE_NAME) ?? 'haruhi',
@@ -53,7 +53,7 @@ const account = reactive<IAccount>({
 })
 // 引入login的pinia状态(激活该实例使其内部方法可以被调用)
 const loginStore = useLoginStore()
-const showPassword = ref(true)
+const showPassword = shallowRef(true)
 // 2.定义校验规则
 const accountRules: FormRules = {
   /* 两部分组成：一个是必传校验，一个是传入数据校验，支持正则表达式 */

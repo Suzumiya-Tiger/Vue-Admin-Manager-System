@@ -80,14 +80,14 @@
     </div>
     <div class="pagination">
       <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[10, 20, 30]"
         :small="small"
         :disabled="disabled"
         :background="background"
         layout="total,prev, pager,next,sizes,jumper"
-        :total="usersTotalCount"
+        :page-count="usersTotalCount"
         @update:current-page="handleCurrentChange"
         @update:page-size="handleSizeChange"
       />
@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { shallowRef, computed } from 'vue'
 import useSystemStore from '@/store/main/system/system'
 import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
@@ -106,11 +106,11 @@ import usePermissions from '@/hooks/usePermissions'
 const emit = defineEmits(['newBtnClick', 'editBtnClick', 'deleteBtnClick'])
 
 // 分页器
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-const currentPage = ref(1)
-const pageSize = ref(10)
+const small = shallowRef(false)
+const background = shallowRef(false)
+const disabled = shallowRef(false)
+const currentPage = shallowRef(1)
+const pageSize = shallowRef(10)
 const handleSizeChange = () => {
   fetchUserListData()
 }

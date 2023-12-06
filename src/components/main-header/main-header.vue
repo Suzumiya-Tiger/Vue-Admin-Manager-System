@@ -13,12 +13,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import HeaderCrumb from './c-cpns/header-crumb.vue'
 import HeaderInfo from './c-cpns/header-info.vue'
 // 0 内部自定义事件
 const emit = defineEmits(['foldChange'])
-const isFold = ref(false)
+const isFold = shallowRef(false)
 function handleFoldClick() {
   // 1.内部改变状态
   isFold.value = !isFold.value

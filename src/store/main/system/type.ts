@@ -10,6 +10,7 @@ export interface IUser {
   updateAt: string
 }
 export interface ISystemState {
+  isFirstLoad: boolean
   usersList: IUser[]
   usersTotalCount: number
   pageList: any[]

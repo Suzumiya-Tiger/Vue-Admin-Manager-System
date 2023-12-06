@@ -36,10 +36,10 @@
 
 <script setup lang="ts">
 import { localCache } from '@/utils/cache'
-import { ref, watch } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
 
-const btnLoading = ref(false)
+const btnLoading = shallowRef(false)
 const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
 watch(isRemPwd, (newVal) => {
   localCache.setCache('isRemPwd', newVal)

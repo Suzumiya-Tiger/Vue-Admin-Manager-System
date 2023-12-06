@@ -17,12 +17,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { shallowRef } from 'vue'
 import MainMenu from '@/components/main-menu/main-menu.vue'
 import MainHeader from '@/components/main-header/main-header.vue'
 
 // 处理main-header中折叠的变化
-const isFold = ref(false)
+const isFold = shallowRef(false)
 function handleFoldChange(isFoldValue: boolean) {
   isFold.value = isFoldValue
 }

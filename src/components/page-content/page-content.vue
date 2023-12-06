@@ -8,6 +8,7 @@
     </div>
     <div class="table">
       <el-table
+        ref="tableRef"
         :data="pageList"
         border
         style="width: 100%"
@@ -83,14 +84,14 @@
     </div>
     <div class="pagination">
       <el-pagination
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
+        :current-page="currentPage"
+        :page-size="pageSize"
         :page-sizes="[10, 20, 30]"
         :small="small"
         :disabled="disabled"
         :background="background"
         layout="total,prev, pager,next,sizes,jumper"
-        :total="pageTotalCount"
+        :page-count="pageTotalCount"
         @update:current-page="handleCurrentChange"
         @update:page-size="handleSizeChange"
       />
@@ -99,16 +100,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { shallowRef, nextTick, ref, onMounted } from 'vue'
 import useSystemStore from '@/store/main/system/system'
+import type { ISystemState } from '@/store/main/system/type'
+import useMainStore from '@/store/main/main'
 import { storeToRefs } from 'pinia'
 import { formatUTC } from '@/utils/date-format'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElTable } from 'element-plus'
 import type { IProps } from './type'
 import usePermissions from '@/hooks/usePermissions'
+import { withLoading } from '@/hooks/withLoading'
+
 const props = defineProps<IProps>()
 // 定义事件
 const emit = defineEmits(['newBtnClick', 'editBtnClick'])
+const tableRef = ref<InstanceType<typeof ElTable>>()
 
 // 0.获取是否存在对应的增删改查的权限
 
@@ -121,15 +127,15 @@ const isUpdate = usePermissions(`${props.contentConfig.pageName}:update`)
 const isQuery = usePermissions(`${props.contentConfig.pageName}:query`)
 
 // 分页器
-const small = ref(false)
-const background = ref(false)
-const disabled = ref(false)
-const currentPage = ref(1)
-const pageSize = ref(10)
-const handleSizeChange = () => {
+const small = shallowRef(false)
+const background = shallowRef(false)
+const disabled = shallowRef(false)
+const currentPage = shallowRef(1)
+const pageSize = shallowRef(10)
+function handleSizeChange() {
   fetchPageListData()
 }
-const handleCurrentChange = () => {
+function handleCurrentChange() {
   fetchPageListData()
 }
 
@@ -151,8 +157,9 @@ systemStore.$onAction(({ name, after }) => {
   })
 })
 // 发起pinia的action，请求usersList的数据
-fetchPageListData()
-
+onMounted(() => {
+  fetchPageListData()
+})
 // 2.通过在pinia的systemStore对象中完成数据请求，再获取usersList的数据,进行展示
 // 注意这里是分开执行的是异步操作，所以usersList的数据如果通过同步的方式获取最后得到是空的
 /* 在 Pinia 中，storeToRefs 是一个辅助函数，
@@ -163,7 +170,7 @@ const { pageList, pageTotalCount } = storeToRefs(systemStore)
 
 // 3.定义函数用于发送网络请求
 // formData可能是空的，这里要进行默认数据判断处理
-function fetchPageListData(formData: any = {}) {
+async function fetchPageListData(formData: any = {}) {
   if (!isQuery) {
     return
   }
@@ -172,8 +179,19 @@ function fetchPageListData(formData: any = {}) {
   const offset = (currentPage.value - 1) * size
   const pageInfo = { size, offset }
   // 2.发送网络请求
+
   const queryInfo = { ...pageInfo, ...formData }
-  systemStore.postPageListAction(props.contentConfig.pageName, queryInfo)
+
+  await withLoading(
+    () =>
+      systemStore.postPageListAction(props.contentConfig.pageName, queryInfo),
+    {
+      lock: true,
+      text: '正在加载中...',
+      background: 'rgba(122, 122, 122, 0.8)',
+      target: tableRef.value?.$el
+    }
+  )()
 }
 // 4.删除用户
 async function handleDeleteClick(id: number) {
@@ -199,19 +217,37 @@ async function handleDeleteClick(id: number) {
     })
     return
   }
-  fetchPageListData()
+  const useStore = useSystemStore()
+  useStore.changeFirstLoad()
+  // fetchPageListData()
   ElMessage({
     message: '删除成功',
     type: 'success'
   })
 }
+
+async function isGetEntireData() {
+  const mainStore: ISystemState = useSystemStore()
+  if (mainStore.isFirstLoad) {
+    // 获取完整的全局应用数据
+    const mainStore = useMainStore()
+
+    await withLoading(() =>
+      mainStore.fetchEntireDataAction(props.contentConfig.pageName)
+    )()
+  }
+}
 // 5.创建用户的操作
 async function createNewUserClick() {
+  await isGetEntireData()
   emit('newBtnClick')
 }
 // 6.编辑用户的操作
 async function handleEditClick(rowData: any) {
-  emit('editBtnClick', rowData)
+  await isGetEntireData()
+  nextTick(() => {
+    emit('editBtnClick', rowData)
+  })
 }
 
 // 将该函数暴露出去，供其他组件使用

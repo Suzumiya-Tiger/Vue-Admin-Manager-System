@@ -1526,6 +1526,8 @@ const option = computed<EChartsOption>(() => {
 
 我们在**dashboard.vue**里面请求对应的数据，并且利用数组的map方法根据echart指定的数据格式进行转换，随后将其装载进对应的图表类型组件即可完成操作：
 
+
+
 ```vue
 <template>
     <-- ...省略前后的若干代码 -->
@@ -1550,7 +1552,17 @@ const showGoodsCategoryCount = computed(() => {
 
 ---
 
-## 项目启动
+## 
+
+**Loading组件**
+
+先在hooks里面定义一个withLoading，将El-loading的逻辑和options封装在该文件中。
+
+我们之所以封装这个组件，一是为了避免每个页面都需要繁冗的loadingOption的配置，而是为了在请求失败的时候关闭loading效果，通过统一地封装在这个组件中，可以快速且间接地在需要应用loading的页面，全局或区域化地实现loading效果。
+
+代码逻辑是非常简单的，难点在于ts的封装和请求成功/失败的逻辑判断，代码已经写了详细的注释，欢迎查阅。
+
+# 项目启动
 
 ```sh
 pnpm install
