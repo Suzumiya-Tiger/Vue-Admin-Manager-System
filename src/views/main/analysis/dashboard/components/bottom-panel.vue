@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { onMounted, watch, nextTick } from 'vue'
 import { CountUp } from 'countup.js'
 import type { analysisOption } from '@/types/powerScreen/analysisData'
 interface IProps {
