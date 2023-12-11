@@ -25,7 +25,9 @@ let myChart: {
 } | null = null
 onMounted(() => {
   setupEchart(props.pieDatas)
-  window.addEventListener('resize', myChart.resizeFn)
+  if (myChart && myChart.resizeFn) {
+    window.addEventListener('resize', myChart.resizeFn)
+  }
 })
 // 监听echartDatas的变化
 watch(
