@@ -34,14 +34,12 @@ export default function useEcharts(divEl: Ref<HTMLDivElement>) {
     echartInstance.setOption(option)
   }
   const resizeEcharts = () => {
-    console.log('页面变动')
     echartInstance.resize()
   }
   const resizeFn = _.throttle(resizeEcharts, 100)
 
   // 释放资源
   onUnmounted(() => {
-    console.log('3')
     window.removeEventListener('resize', resizeFn)
     // 销毁实例
     echartInstance.dispose()

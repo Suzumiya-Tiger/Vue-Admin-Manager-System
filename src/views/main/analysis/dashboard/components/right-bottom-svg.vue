@@ -99,7 +99,6 @@ interface IProps {
 }
 const props = defineProps<IProps>()
 const dotData = ref(props.dots)
-
 watchEffect(() => {
   dotData.value = props.dots
 })
