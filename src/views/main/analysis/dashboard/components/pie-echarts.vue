@@ -21,10 +21,11 @@ const divRef = ref() as Ref<HTMLDivElement>
 let myChart: {
   echartInstance: any
   setOption?: (option: any) => void
-  resizeEcharts?: () => void
+  resizeFn?: () => void
 } | null = null
 onMounted(() => {
   setupEchart(props.pieDatas)
+  window.addEventListener('resize', myChart.resizeFn)
 })
 // 监听echartDatas的变化
 watch(
@@ -85,8 +86,8 @@ function setOption(pieDatas: pieData) {
     legend: {
       orient: 'vertical',
       right: '4%',
-      top: '18%',
-      itemGap: 20,
+      top: '16%',
+      itemGap: 16,
       itemWidth: 10,
       itemHeigth: 10,
       icon: 'rect',

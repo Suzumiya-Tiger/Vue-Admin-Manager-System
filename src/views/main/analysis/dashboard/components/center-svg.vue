@@ -1297,7 +1297,7 @@ onMounted(() => {
 .cls-5,
 .cls-6,
 .cls-7 {
-  stroke-width: 3px;
+  stroke-width: 0.0156rem;
 }
 
 .cls-1,
@@ -1528,7 +1528,7 @@ onMounted(() => {
 .cls-32,
 .cls-33,
 .cls-34 {
-  stroke-width: 4px;
+  stroke-width: 0.0208rem;
 }
 
 .cls-32 {
@@ -1549,7 +1549,7 @@ onMounted(() => {
 
 .cls-35,
 .cls-36 {
-  stroke-width: 2px;
+  stroke-width: 0.0104rem;
   opacity: 0.8;
 }
 
@@ -1665,7 +1665,7 @@ onMounted(() => {
 }
 
 .cls-57 {
-  font-size: 41.603px;
+  font-size: 0.2167rem;
   fill: #338ed5;
   text-anchor: middle;
   font-family: 'Source Han Sans CN';
@@ -1693,10 +1693,10 @@ onMounted(() => {
 @keyframes updown {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0rem);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-0.0521rem);
   }
 }
 /* 灯光特效用opacity来实现(一闪一现) */
@@ -1795,21 +1795,21 @@ onMounted(() => {
 /* 向上移动的烟花 */
 @keyframes lingxA {
   from {
-    transform: translateY(0px);
+    transform: translateY(0rem);
     opacity: 1;
   }
   60% {
     opacity: 1;
   }
   to {
-    transform: translateY(-160px);
+    transform: translateY(-0.8333rem);
     opacity: 0;
   }
 }
 
 @keyframes lingxB {
   from {
-    transform: translateY(0px);
+    transform: translateY(0rem);
     opacity: 1;
   }
 
@@ -1819,14 +1819,14 @@ onMounted(() => {
 
   60%,
   to {
-    transform: translateY(-120px);
+    transform: translateY(-0.625rem);
     opacity: 0;
   }
 }
 
 @keyframes lingxC {
   from {
-    transform: translateY(0px);
+    transform: translateY(0rem);
     opacity: 1;
   }
 
@@ -1836,7 +1836,7 @@ onMounted(() => {
 
   50%,
   to {
-    transform: translateY(-90px);
+    transform: translateY(-0.4688rem);
     opacity: 0;
   }
 }

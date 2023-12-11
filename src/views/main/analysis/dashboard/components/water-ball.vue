@@ -1,7 +1,7 @@
 <template>
   <div class="water-ball">
     <!-- 波浪icon -->
-    <svg x="0px" y="0px" style="display: none">
+    <svg x="0rem" y="0rem" style="display: none">
       <symbol id="wave">
         <path
           d="M420,20c21.5-0.4,38.8-2.5,51.1-4.5c13.4-2.2,26.5-5.2,27.3-5.4C514,6.5,518,4.7,528.5,2.7c7.1-1.3,17.9-2.8,31.5-2.7c0,0,0,0,0,0v20H420z"
@@ -45,9 +45,9 @@ interface waterballProps {
   countSize?: string
 }
 const props = withDefaults(defineProps<waterballProps>(), {
-  size: '190px',
+  size: '.9896rem',
   percentage: 70,
-  countSize: '40px'
+  countSize: '.2083rem'
 })
 
 const countRef = ref<HTMLElement>()
@@ -138,7 +138,7 @@ function startAnimate(percentage = 0) {
 .box .water_wave_front {
   left: 0;
   fill: #00c6ff;
-  margin-bottom: -1px;
+  margin-bottom: -0.0052rem;
   animation: wave-front 0.7s infinite linear;
 }
 @keyframes wave-front {

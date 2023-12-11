@@ -19,10 +19,11 @@ const divRef = ref() as Ref<HTMLDivElement>
 let myChart: {
   echartInstance: any
   setOption?: (option: any) => void
-  resizeEcharts?: () => void
+  resizeFn?: () => void
 } | null = null
 onMounted(() => {
   setupEchart(props.barData)
+  window.addEventListener('resize', myChart.resizeFn)
 })
 // 监听echartDatas的变化
 watch(

@@ -22,7 +22,7 @@ interface IAnalysisState {
   exceptionMonitoringData: IDots
   analysisData: analysisOption
   topPercentageData: topOption
-  totalPercentageData: number
+  totalPercentage: number
 }
 const analysisStore = defineStore('analysis', {
   state: (): IAnalysisState => ({
@@ -41,7 +41,7 @@ const analysisStore = defineStore('analysis', {
     exceptionMonitoringData: [],
     analysisData: [],
     topPercentageData: [],
-    totalPercentageData: 0
+    totalPercentage: 0
   }),
   actions: {
     async fetchAnalysisDataAction() {
@@ -58,8 +58,7 @@ const analysisStore = defineStore('analysis', {
       this.analysisData = [...analysisResult.data]
       const topPercentageResult = await getChargingTop4()
       this.topPercentageData = [...topPercentageResult.data[0].data]
-      const totalPercentageResult = await getChargingStatistics()
-      this.totalPercentageData = totalPercentageResult.data[0]?.totalPercentage
+      this.totalPercentage = Number(topPercentageResult.data[0].totalPercentage)
     }
   }
 })

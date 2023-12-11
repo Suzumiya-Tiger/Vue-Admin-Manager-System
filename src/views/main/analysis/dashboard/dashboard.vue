@@ -37,7 +37,7 @@
         <div class="right-top">
           <right-top-panel
             :panelItems="topPercentageData"
-            :percentage="totalPercentageData"
+            :percentage="totalPercentage"
           ></right-top-panel>
         </div>
         <div class="right-center">
@@ -83,7 +83,7 @@ const {
   exceptionMonitoringData,
   analysisData,
   topPercentageData,
-  totalPercentageData
+  totalPercentage
 } = storeToRefs(analysisStore)
 </script>
 <style lang="less" scoped>
@@ -105,7 +105,7 @@ const {
     background-image: url(@/assets/images/bg_header.svg);
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    background-position-y: 10px;
+    background-position-y: 0.0521rem;
   }
   .main-container {
     display: flex;
@@ -132,7 +132,7 @@ const {
       .left-bottom {
         width: 2.375rem;
         height: 2.0938rem;
-        margin-top: 10px;
+        margin-top: 0.0521rem;
         /* 背景 */
         background-image: url(@/assets/images/bg_left_bottom.svg);
         background-repeat: no-repeat;
@@ -145,7 +145,7 @@ const {
       flex-direction: column;
       justify-content: space-between;
       flex-wrap: nowrap;
-      margin-top: 5px;
+      margin-top: 0.026rem;
       height: 100%;
       .right-top {
         width: 2.4219rem;

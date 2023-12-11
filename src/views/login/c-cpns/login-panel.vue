@@ -51,7 +51,7 @@ watch(isRemPwd, (newVal) => {
   然后用 InstanceType 将其转换为 PaneAccount 类的实例类型。 */
 // 通过调用ref可以获取对应的组件实例
 const accountRef = ref<InstanceType<typeof PaneAccount>>()
-const activeName = 'account'
+let activeName = 'account'
 function handleLoginBtnClick() {
   btnLoading.value = true
 

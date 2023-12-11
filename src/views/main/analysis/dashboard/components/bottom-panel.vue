@@ -85,18 +85,18 @@ function startNumberAnimation(panelItemData: analysisOption) {
 }
 
 .bottom-content .item {
-  font-size: 14px;
+  font-size: 0.0729rem;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 60px;
-  padding: 0 10px 0 35px;
+  margin-top: 0.3125rem;
+  padding: 0 0.0521rem 0 0.1823rem;
   /* border: 1px solid red; */
 }
 
 .bottom-content .pan-left {
-  font-size: 16px;
+  font-size: 0.0833rem;
   color: #ffffff;
   opacity: 0.8;
 }
@@ -104,41 +104,41 @@ function startNumberAnimation(panelItemData: analysisOption) {
   color: white;
 }
 .bottom-content .pan-left .number {
-  font-size: 20px;
+  font-size: 0.1042rem;
   font-weight: bold;
   color: #23aeff;
-  line-height: 60px;
+  line-height: 0.3125rem;
 }
 
 .bottom-content .pan-left .unit {
-  font-size: 16px;
+  font-size: 0.0833rem;
   color: #23aeff;
 }
 
 .bottom-content .pan-right {
-  margin-top: 32px;
+  margin-top: 0.1667rem;
 }
 
 .bottom-content .panel1 .pan-right .up-triangle {
   display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: 0.0208rem;
   width: 0;
   height: 0;
-  border-bottom: 8px solid #c70013;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
+  border-bottom: 0.0417rem solid #c70013;
+  border-left: 0.0417rem solid transparent;
+  border-right: 0.0417rem solid transparent;
 }
 .bottom .panel1 .pan-right .percentage {
   color: #c70013;
 }
 .bottom .panel2 .pan-right .up-triangle {
   display: inline-block;
-  margin-bottom: 4px;
+  margin-bottom: 0.0208rem;
   width: 0;
   height: 0;
-  border-bottom: 8px solid #c70013;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
+  border-bottom: 0.0417rem solid #c70013;
+  border-left: 0.0417rem solid transparent;
+  border-right: 0.0417rem solid transparent;
 }
 .bottom-content .panel2 .pan-right .percentage {
   color: #c70013;
@@ -146,12 +146,12 @@ function startNumberAnimation(panelItemData: analysisOption) {
 
 .bottom-content .panel3 .pan-right .down-triangle {
   display: inline-block;
-  margin-bottom: 1px;
+  margin-bottom: 0.0052rem;
   width: 0;
   height: 0;
-  border-top: 8px solid #37a73f;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
+  border-top: 0.0417rem solid #37a73f;
+  border-left: 0.0417rem solid transparent;
+  border-right: 0.0417rem solid transparent;
 }
 .bottom-content .panel3 .pan-right .percentage {
   color: #37a73f;

@@ -111,7 +111,7 @@ watchEffect(() => {
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 4px;
+  stroke-width: 0.0208rem;
   fill-rule: evenodd;
 }
 

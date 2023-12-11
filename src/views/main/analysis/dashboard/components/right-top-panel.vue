@@ -35,27 +35,27 @@ const props = defineProps<IProps>()
 }
 
 .right-top-panel .right-water-ball {
-  width: 189px;
-  height: 199px;
-  margin-top: 20px;
-  margin-left: 40px;
+  width: 0.9844rem;
+  height: 1.0365rem;
+  margin-top: 0.1042rem;
+  margin-left: 0.2083rem;
 }
 
 .right-top-panel .legend {
   flex: 1;
 }
 .right-top-panel .leg-name {
-  margin-top: 23px;
-  margin-left: 40px;
+  margin-top: 0.1198rem;
+  margin-left: 0.2083rem;
 }
 .right-top-panel .leg-name span {
   display: inline-block;
-  font-size: 16px;
-  margin-right: 11px;
+  font-size: 0.0833rem;
+  margin-right: 0.0573rem;
 }
 .right-top-panel .legend .dot {
-  width: 17px;
-  height: 17px;
+  width: 0.0885rem;
+  height: 0.0885rem;
   border-radius: 50%;
 }
 .right-top-panel .legend .area1 {

@@ -7,7 +7,7 @@
  * 4.控制echarts的resize(响应式)
  */
 import _ from 'lodash'
-import { onUnmounted, onMounted, ref, type Ref } from 'vue'
+import { onUnmounted, onMounted, type Ref } from 'vue'
 import * as echarts from 'echarts'
 // 如果你的 divEl 实际上是一个 Ref<HTMLDivElement>（来自 Vue 的 ref），
 // 那么你需要使用.value 属性来获取实际的 HTMLDivElement 对象。
@@ -34,15 +34,14 @@ export default function useEcharts(divEl: Ref<HTMLDivElement>) {
     echartInstance.setOption(option)
   }
   const resizeEcharts = () => {
+    console.log('页面变动')
     echartInstance.resize()
   }
-  const resizeFn = _.throttle(resizeEcharts, 300)
+  const resizeFn = _.throttle(resizeEcharts, 100)
 
-  onMounted(() => {
-    window.addEventListener('resize', resizeFn)
-  })
   // 释放资源
   onUnmounted(() => {
+    console.log('3')
     window.removeEventListener('resize', resizeFn)
     // 销毁实例
     echartInstance.dispose()
@@ -51,6 +50,6 @@ export default function useEcharts(divEl: Ref<HTMLDivElement>) {
   return {
     echartInstance,
     setOption,
-    resizeEcharts
+    resizeFn
   }
 }
