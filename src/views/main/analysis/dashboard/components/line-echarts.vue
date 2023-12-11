@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import * as echarts from 'echarts'
 import type { Ref } from 'vue'
 
 import useEcharts from '@/hooks/useEcharts'

@@ -59,7 +59,6 @@
   </main>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import useAnalysisStore from '@/store/main/analysis/analysis'
 import { storeToRefs } from 'pinia'
 

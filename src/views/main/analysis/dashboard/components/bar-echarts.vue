@@ -5,7 +5,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import type { Ref } from 'vue'
-import * as echarts from 'echarts'
 import useEcharts from '@/hooks/useEcharts'
 import type { barDataOption } from '@/types/powerScreen/barData'
 interface IProps {
