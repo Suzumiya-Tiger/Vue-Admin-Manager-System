@@ -67,31 +67,34 @@
                 </p>
               </div>
               <div class="rtMove">
-                <img class="tuB" src="@/assets/img/overview/tuB.png" />
-                <img class="guangA" src="@/assets/img/overview/guang.png" />
-                <img class="guangB" src="@/assets/img/overview/guang.png" />
-                <img class="tuC" src="@/assets/img/overview/tuC.png" />
+                <img class="tuB" src="@/assets/images/overview/tuB.png" />
+                <img class="guangA" src="@/assets/images/overview/guang.png" />
+                <img class="guangB" src="@/assets/images/overview/guang.png" />
+                <img class="tuC" src="@/assets/images/overview/tuC.png" />
 
-                <img class="lingxA" src="@/assets/img/overview/lingxA.png" />
-                <img class="lingxB" src="@/assets/img/overview/lingxB.png" />
-                <img class="lingxC" src="@/assets/img/overview/lingxC.png" />
-                <img class="lingxD" src="@/assets/img/overview/lingxD.png" />
-                <img class="lingxE" src="@/assets/img/overview/lingxE.png" />
-                <img class="lingxF" src="@/assets/img/overview/lingxF.png" />
+                <img class="lingxA" src="@/assets/images/overview/lingxA.png" />
+                <img class="lingxB" src="@/assets/images/overview/lingxB.png" />
+                <img class="lingxC" src="@/assets/images/overview/lingxC.png" />
+                <img class="lingxD" src="@/assets/images/overview/lingxD.png" />
+                <img class="lingxE" src="@/assets/images/overview/lingxE.png" />
+                <img class="lingxF" src="@/assets/images/overview/lingxF.png" />
 
-                <img class="chaunB" src="@/assets/img/overview/chaunB.png" />
-                <img class="chaunC" src="@/assets/img/overview/chaunB.png" />
-                <img class="tuA" src="@/assets/img/overview/tuA.png" />
-                <img class="tuAa" src="@/assets/img/overview/tuA.png" />
+                <img class="chaunB" src="@/assets/images/overview/chaunB.png" />
+                <img class="chaunC" src="@/assets/images/overview/chaunB.png" />
+                <img class="tuA" src="@/assets/images/overview/tuA.png" />
+                <img class="tuAa" src="@/assets/images/overview/tuA.png" />
 
-                <img class="ziA" src="@/assets/img/overview/ziA.png" />
-                <img class="ziB" src="@/assets/img/overview/ziB.png" />
-                <img class="ziC" src="@/assets/img/overview/ziC.png" />
+                <img class="ziA" src="@/assets/images/overview/ziA.png" />
+                <img class="ziB" src="@/assets/images/overview/ziB.png" />
+                <img class="ziC" src="@/assets/images/overview/ziC.png" />
 
-                <img class="ma tuAn" src="@/assets/img/overview/tuAn.png" />
-                <img class="ma tuMing" src="@/assets/img/overview/tuMing.png" />
+                <img class="ma tuAn" src="@/assets/images/overview/tuAn.png" />
+                <img
+                  class="ma tuMing"
+                  src="@/assets/images/overview/tuMing.png"
+                />
 
-                <img class="ren" src="@/assets/img/overview/ren.png" />
+                <img class="ren" src="@/assets/images/overview/ren.png" />
               </div>
             </div>
           </div></div
@@ -176,7 +179,7 @@
   left: 0;
   top: 0;
   z-index: 1;
-  background-image: url(@/assets/img/overview/banbj.jpeg);
+  background-image: url(@/assets/images/overview/banbj.jpeg);
   border-radius: 4px;
   background-size: cover;
   background-repeat: no-repeat;
@@ -202,7 +205,7 @@
   position: absolute;
   right: 70px;
   top: 40px;
-  background-image: url(@/assets/img/overview/banner.png);
+  background-image: url(@/assets/images/overview/banner.png);
   background-position: center bottom;
   background-repeat: no-repeat;
 }

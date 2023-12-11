@@ -3,6 +3,8 @@ import 'default-passive-events'
 // 公用的基础css文件
 import 'normalize.css'
 import './assets/css/index.less'
+import '@/utils/flexible'
+
 // 需要在env.d.ts中声明vue是一个模块组件
 import App from './App.vue'
 import router from './router'

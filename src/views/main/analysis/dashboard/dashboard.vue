@@ -1,121 +1,198 @@
 <template>
-  <div class="dashboard">
-    <!-- 1.顶部的数字的数据展示 -->
-    <el-row :gutter="10">
-      <template v-for="item in amountList" :key="item">
-        <el-col :span="6" :xs="24" :sm="12" :md="8" :lg="6">
-          <count-card v-bind="item"></count-card>
-        </el-col>
-      </template>
-    </el-row>
-    <!-- 中间内容的图表 -->
-    <el-row :gutter="5">
-      <el-col :span="7">
-        <chart-card header="商品销量总览">
-          <PieEchart :pieData="showGoodsCategoryCount" />
-        </chart-card>
-      </el-col>
-      <el-col :span="10">
-        <chart-card header="全国总销量"
-          ><MapEchart :mapData="showGoodsAddressSale" />
-        </chart-card>
-      </el-col>
-      <el-col :span="7">
-        <chart-card header="商品销量比例"
-          ><RoseEchart :roseData="showGoodsCategoryCount"
-        /></chart-card>
-      </el-col>
-    </el-row>
-    <!-- 底部的图表 -->
-    <el-row :gutter="10">
-      <el-col :span="12">
-        <chart-card header="商品收藏量">
-          <LineEchart v-bind="showRoseCategoryFavor"
-        /></chart-card>
-      </el-col>
-      <el-col :span="12">
-        <chart-card header="分类商品销量">
-          <BarEchart v-bind="showRoseCategorySale" />
-        </chart-card>
-      </el-col>
-    </el-row>
-  </div>
-</template>
+  <main class="screen-bg">
+    <div class="header"></div>
 
+    <div class="main-container">
+      <div class="left-container">
+        <div class="left-top">
+          <pie-charts
+            :pieDatas="pieEchartData"
+            width="100%"
+            height="100%"
+          ></pie-charts>
+        </div>
+        <div class="left-bottom">
+          <line-echarts
+            :lineData="lineEchartData"
+            width="100%"
+            height="100%"
+          ></line-echarts>
+        </div>
+      </div>
+
+      <div class="center-container">
+        <div class="center">
+          <center-svg></center-svg>
+        </div>
+        <div class="bottom">
+          <bottom-panel
+            :panelItems="analysisData"
+            width="100%"
+            height="100%"
+          ></bottom-panel>
+        </div>
+      </div>
+
+      <div class="right-container">
+        <div class="right-top">
+          <right-top-panel
+            :panelItems="topPercentageData"
+            :percentage="totalPercentageData"
+          ></right-top-panel>
+        </div>
+        <div class="right-center">
+          <bar-echarts
+            :barData="barEchartData"
+            width="100%"
+            height="100%"
+          ></bar-echarts>
+        </div>
+        <div class="right-bottom">
+          <right-bottom-svg
+            width="100%"
+            height="100%"
+            :dots="exceptionMonitoringData"
+          ></right-bottom-svg>
+        </div>
+      </div>
+    </div>
+  </main>
+</template>
 <script setup lang="ts">
-import CountCard from '@/components/count-card/count-card.vue'
-import ChartCard from '@/components/chart-card/chart-card.vue'
+import { ref, onMounted } from 'vue'
 import useAnalysisStore from '@/store/main/analysis/analysis'
 import { storeToRefs } from 'pinia'
-import {
-  PieEchart,
-  LineEchart,
-  RoseEchart,
-  BarEchart,
-  MapEchart
-} from '@/components/page-echart'
-import { computed } from 'vue'
+
+import pieCharts from './components/pie-echarts.vue'
+import lineEcharts from './components/line-echarts.vue'
+import barEcharts from './components/bar-echarts.vue'
+// 水球
+import rightTopPanel from './components/right-top-panel.vue'
+// 右边底部svg
+import rightBottomSvg from './components/right-bottom-svg.vue'
+import centerSvg from './components/center-svg.vue'
+import bottomPanel from './components/bottom-panel.vue'
+
 // 1.先发起获取数据的请求
 const analysisStore = useAnalysisStore()
 analysisStore.fetchAnalysisDataAction()
 // 2.再从store中获取数据
 const {
-  amountList,
-  goodsCategoryCount,
-  goodsCategorySale,
-  goodsCategoryFavor,
-  goodsAddressSale
+  pieEchartData,
+  lineEchartData,
+  barEchartData,
+  exceptionMonitoringData,
+  analysisData,
+  topPercentageData,
+  totalPercentageData
 } = storeToRefs(analysisStore)
-
-// 3.为echart组件提供数据
-const showGoodsCategoryCount = computed(() => {
-  return goodsCategoryCount.value.map((item) => {
-    return {
-      name: item.name,
-      value: item.count
-    }
-  })
-})
-const showRoseCategorySale = computed(() => {
-  const labels: string[] = []
-  const values: any[] = []
-  for (const item of goodsCategorySale.value) {
-    labels.push(item.name)
-    values.push(item.goodsCount)
-  }
-  return {
-    labels,
-    values
-  }
-})
-const showRoseCategoryFavor = computed(() => {
-  const labels: string[] = []
-  const values: any[] = []
-  for (const item of goodsCategoryFavor.value) {
-    labels.push(item.name)
-    values.push(item.goodsFavor)
-  }
-  return {
-    labels,
-    values
-  }
-})
-
-const showGoodsAddressSale = computed(() => {
-  return goodsAddressSale.value.map((item) => {
-    return {
-      name: item.address,
-      value: item.count
-    }
-  })
-})
 </script>
-
 <style lang="less" scoped>
-.dashboard {
-  background-color: #f5f5f5;
-  .el-row {
-    margin-top: 20px;
+:global(.el-main) {
+  --el-main-padding: 0 !important;
+}
+.screen-bg {
+  position: relative;
+  height: 100%;
+  /* 背景 */
+  background-image: url(@/assets/images/bg.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  .header {
+    // 定位
+    height: 0.1875rem;
+    padding-top: 0.0521rem;
+    // 背景
+    background-image: url(@/assets/images/bg_header.svg);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    background-position-y: 10px;
+  }
+  .main-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    .left-container {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      padding-top: 0;
+      height: 100%;
+      .left-top {
+        /* 定位 */
+        width: 2.375rem;
+        height: 2.0833rem;
+
+        /* 背景 */
+        background-image: url(@/assets/images/bg_left-top.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .left-bottom {
+        width: 2.375rem;
+        height: 2.0938rem;
+        margin-top: 10px;
+        /* 背景 */
+        background-image: url(@/assets/images/bg_left_bottom.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+    }
+
+    .right-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex-wrap: nowrap;
+      margin-top: 5px;
+      height: 100%;
+      .right-top {
+        width: 2.4219rem;
+        height: 1.5rem;
+        background-image: url(@/assets/images/bg_right_top.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .right-center {
+        width: 2.4219rem;
+        height: 1.5469rem;
+
+        background-image: url(@/assets/images/bg_right_center.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+      .right-bottom {
+        width: 2.4219rem;
+        height: 1.1042rem;
+        background-image: url(@/assets/images/bg_right_bottom.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        display: flex;
+        justify-content: center;
+      }
+    }
+
+    .center-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      flex-wrap: nowrap;
+      .center {
+        width: 3.2448rem;
+        height: 3.1771rem;
+      }
+
+      .bottom {
+        width: 3.401rem;
+        height: 0.776rem;
+
+        background-image: url(@/assets/images/bg_bottom.svg);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
+    }
   }
 }
 </style>

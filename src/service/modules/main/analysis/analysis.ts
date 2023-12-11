@@ -1,28 +1,33 @@
 import hyRequest from '@/service'
 
-export function getGoodsAmountListData() {
-  return hyRequest.get({
-    url: '/goods/amount/list'
+export function getchargingPile() {
+  return hyRequest.post({
+    url: '/charging/piles/list'
   })
 }
 
-export function getGoodsCategoryCount() {
-  return hyRequest.get({
-    url: '/goods/category/count'
+export function getProcessMonitoring() {
+  return hyRequest.post({
+    url: '/charging/processMonitoring/list'
   })
 }
-export function getGoodsCategorySale() {
-  return hyRequest.get({
-    url: '/goods/category/sale'
+export function getDataAnalysis() {
+  return hyRequest.post({
+    url: '/charging/dataAnalysis/list'
   })
 }
-export function getGoodsCategoryCollect() {
-  return hyRequest.get({
-    url: '/goods/category/favor'
+export function getChargingTop4() {
+  return hyRequest.post({
+    url: '/charging/stationTop4/list'
   })
 }
-export function getGoodsAddressSale() {
-  return hyRequest.get({
-    url: '/goods/address/sale'
+export function getChargingStatistics() {
+  return hyRequest.post({
+    url: '/charging/statistics/list'
+  })
+}
+export function getExceptionMonitoring() {
+  return hyRequest.post({
+    url: '/charging/exceptionMonitoring/list'
   })
 }

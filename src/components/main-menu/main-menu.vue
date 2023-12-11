@@ -2,7 +2,7 @@
   <div class="main-menu">
     <!-- logo -->
     <div class="logo">
-      <img class="img" src="@/assets/img/logo.svg" alt="" />
+      <img class="img" src="@/assets/images/logo.svg" alt="" />
       <h2 v-show="!isFold" class="title">Lyoko管理系统</h2>
     </div>
     <div class="menu">

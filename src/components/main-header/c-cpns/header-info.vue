@@ -57,7 +57,7 @@
 import useLoginStore from '@/store/login/login'
 import { localCache } from '@/utils/cache'
 import { useRouter } from 'vue-router'
-import imgUrl from '@/assets/img/avatar.jpg'
+import imgUrl from '@/assets/images/avatar.jpg'
 import { LOGIN_TOKEN } from '@/global/constants'
 const router = useRouter()
 

@@ -69,7 +69,8 @@ function handleLoginBtnClick() {
   border-radius: 8px;
   width: 330px;
   margin-bottom: 30px;
-  background-color: #f5f3f3;
+  margin-right: 100px;
+  background-color: #fcfcfd;
 
   .label {
     display: flex;
