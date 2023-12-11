@@ -8,17 +8,17 @@ export function getchargingPile() {
 
 export function getProcessMonitoring() {
   return hyRequest.post({
-    url: '/charging/processMonitoring/list'
+    url: '/charging/processmonitoring/list'
   })
 }
 export function getDataAnalysis() {
   return hyRequest.post({
-    url: '/charging/dataAnalysis/list'
+    url: '/charging/dataanalysis/list'
   })
 }
 export function getChargingTop4() {
   return hyRequest.post({
-    url: '/charging/stationTop4/list'
+    url: '/charging/stationtop4/list'
   })
 }
 export function getChargingStatistics() {
@@ -28,6 +28,6 @@ export function getChargingStatistics() {
 }
 export function getExceptionMonitoring() {
   return hyRequest.post({
-    url: '/charging/exceptionMonitoring/list'
+    url: '/charging/exceptionmonitoring/list'
   })
 }
