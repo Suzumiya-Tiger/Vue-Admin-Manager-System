@@ -18,8 +18,8 @@ const contentConfig = {
       slotName: 'parent'
     },
     // 区分自定义插槽部分
-    { type: 'timer', label: '创建时间', prop: 'createTime' },
-    { type: 'timer', label: '更新时间', prop: 'updateTime' },
+    { type: 'timer', label: '创建时间', prop: 'createAt' },
+    { type: 'timer', label: '更新时间', prop: 'updateAt' },
 
     { type: 'handler', label: '操作', width: '160px' }
   ]
