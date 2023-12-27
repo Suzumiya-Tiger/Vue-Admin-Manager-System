@@ -86,8 +86,8 @@
         :small="small"
         :disabled="disabled"
         :background="background"
-        layout="total,prev, pager,next,sizes,jumper"
-        :page-count="usersTotalCount"
+        layout="total,prev,pager,next,sizes,jumper"
+        :total="usersTotalCount"
         @update:current-page="handleCurrentChange"
         @update:page-size="handleSizeChange"
       />
@@ -111,10 +111,10 @@ const background = shallowRef(false)
 const disabled = shallowRef(false)
 const currentPage = shallowRef(1)
 const pageSize = shallowRef(10)
-const handleSizeChange = () => {
+function handleSizeChange() {
   fetchUserListData()
 }
-const handleCurrentChange = () => {
+function handleCurrentChange() {
   fetchUserListData()
 }
 // 0.获取是否存在对应的增删改查的权限

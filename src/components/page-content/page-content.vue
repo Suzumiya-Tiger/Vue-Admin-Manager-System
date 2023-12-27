@@ -91,7 +91,7 @@
         :disabled="disabled"
         :background="background"
         layout="total,prev, pager,next,sizes,jumper"
-        :page-count="pageTotalCount"
+        :total="pageTotalCount"
         @update:current-page="handleCurrentChange"
         @update:page-size="handleSizeChange"
       />
