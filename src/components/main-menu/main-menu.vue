@@ -43,7 +43,7 @@
 </template>
 
 <script setup lang="ts">
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { mapPathToMenu } from '@/utils/map-menus'

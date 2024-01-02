@@ -11,8 +11,6 @@ export interface IUser {
 }
 export interface ISystemState {
   isFirstLoad: boolean
-  usersList: IUser[]
-  usersTotalCount: number
   pageList: any[]
   pageTotalCount: number
 }

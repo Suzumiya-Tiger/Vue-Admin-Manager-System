@@ -2,9 +2,12 @@
   <div class="content">
     <div class="header">
       <h3 class="title">{{ contentConfig.headers?.title ?? '数据列表' }}</h3>
-      <el-button v-if="isCreate" type="primary" @click="createNewUserClick">{{
-        contentConfig.headers?.btnTitle ?? '新建数据'
-      }}</el-button>
+      <el-button
+        v-if="isCreate && contentConfig.headers?.btnTitle"
+        type="primary"
+        @click="createNewUserClick"
+        >{{ contentConfig.headers.btnTitle }}</el-button
+      >
     </div>
     <div class="table">
       <el-table
@@ -19,7 +22,7 @@
           <template v-if="item.type && item.type === 'timer'">
             <el-table-column :label="item.label">
               <template #default="scope">
-                <div style="display: flex; align-items: center">
+                <div>
                   {{
                     formatUTC(
                       item.prop ? scope.row[item.prop] : '',
@@ -70,7 +73,11 @@
           <!-- 高阶组件：通过插槽来更为灵活地实现特殊需求，
                 将具体的操作移交给组件调用的模板语法之中去自定义实现 -->
           <template v-else-if="item.type === 'custom'">
-            <el-table-column :label="item.label" :width="item.width">
+            <el-table-column
+              :label="item.label"
+              :width="item.width"
+              :align="item.align"
+            >
               <template #default="scope">
                 <slot :name="item.slotName" v-bind="scope"></slot>
               </template>
@@ -84,8 +91,8 @@
     </div>
     <div class="pagination">
       <el-pagination
-        :current-page="currentPage"
-        :page-size="pageSize"
+        v-model:current-page="currentPage"
+        v-model:page-size="pageSize"
         :page-sizes="[10, 20, 30]"
         :small="small"
         :disabled="disabled"
@@ -93,15 +100,15 @@
         layout="total,prev, pager,next,sizes,jumper"
         :total="pageTotalCount"
         @update:current-page="handleCurrentChange"
-        @update:page-size="handleSizeChange"
+        @update:size-change="handleSizeChange"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { shallowRef, nextTick, ref, onMounted } from 'vue'
-import useSystemStore from '@/store/main/system/system'
+import { shallowRef, nextTick, ref, onBeforeMount } from 'vue'
+import useSystemStore from '@/store/main/system'
 import type { ISystemState } from '@/store/main/system/type'
 import useMainStore from '@/store/main/main'
 import { storeToRefs } from 'pinia'
@@ -132,10 +139,15 @@ const background = shallowRef(false)
 const disabled = shallowRef(false)
 const currentPage = shallowRef(1)
 const pageSize = shallowRef(10)
-function handleSizeChange() {
+const handleSizeChange = (val: number) => {
+  console.log(val)
+
+  pageSize.value = val
   fetchPageListData()
 }
-function handleCurrentChange() {
+const handleCurrentChange = (val: number) => {
+  console.log(val)
+  currentPage.value = val
   fetchPageListData()
 }
 
@@ -156,8 +168,11 @@ systemStore.$onAction(({ name, after }) => {
     }
   })
 })
-// 发起pinia的action，请求usersList的数据
-onMounted(() => {
+/* 在 Vue 和 Pinia 中，storeToRefs 创建的 ref 是响应式的，
+这意味着当 systemStore 中的状态改变时，这些 ref 也会自动更新。
+因此，即使 fetchPageListData 是异步的，
+pageList 和 pageTotalCount 也会在数据准备好后自动更新。 */
+onBeforeMount(() => {
   fetchPageListData()
 })
 // 2.通过在pinia的systemStore对象中完成数据请求，再获取usersList的数据,进行展示
@@ -195,6 +210,7 @@ async function fetchPageListData(formData: any = {}) {
 }
 // 4.删除用户
 async function handleDeleteClick(id: number) {
+  console.log(id)
   /*
   当你使用 await systemstore.deletepagebyidaction() 时，
   await 关键字会等待 Promise 对象(deleteUserById(id))的解析，并将解析后的值作为结果返回。
@@ -219,11 +235,11 @@ async function handleDeleteClick(id: number) {
   }
   const useStore = useSystemStore()
   useStore.changeFirstLoad()
-  // fetchPageListData()
   ElMessage({
     message: '删除成功',
     type: 'success'
   })
+  fetchPageListData()
 }
 
 async function isGetEntireData() {
@@ -256,8 +272,8 @@ defineExpose({ fetchPageListData })
 
 <style lang="less" scoped>
 .content {
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 15px;
+  padding: 15px;
   background-color: #fff;
 
   .header {

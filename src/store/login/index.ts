@@ -62,11 +62,8 @@ const useLoginStore = defineStore('login', {
       // 3.进行本地缓存
       localCache.setCache(USERINFO, userInfo)
       localCache.setCache(USERMENUS, userMenus)
-      // 4.请求所有的roles/departments数据
-      // const mainStore = useMainStore()
-      // mainStore.fetchEntireDataAction()
 
-      // (重要)获取登录用户的所有按钮的权限
+      // 4.(重要)获取登录用户的所有按钮的权限
       const permissionList = mapMenusToPermissions(userMenus)
       this.permissions = [...permissionList]
       // 5.(重要)动态地通过路由映射表添加路由
@@ -91,10 +88,7 @@ const useLoginStore = defineStore('login', {
         this.token = token
         this.userInfo = userInfo
         this.userMenus = userMenus
-        // 1.请求所有的roles/departments数据
-        // const mainStore = useMainStore()
-        // mainStore.fetchEntireDataAction()
-        // (重要)获取登录用户的所有按钮的权限
+        // 1.(重要)获取登录用户的所有按钮的权限
         const permissionList = mapMenusToPermissions(userMenus)
         this.permissions = [...permissionList]
         // 2.动态添加路由

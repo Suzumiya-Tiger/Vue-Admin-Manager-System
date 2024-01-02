@@ -28,7 +28,8 @@
 
 <script setup lang="ts" name="department">
 import { computed } from 'vue'
-import useMainStore from '@/store/main/main'
+import { storeToRefs } from 'pinia'
+import useSystemStore from '@/store/main/system'
 
 // 1.导入组件(vueComponent)
 // 2.导入数据通用配置(config)
@@ -47,11 +48,14 @@ import usePageModal from '@/hooks/usePageModal'
 const { contentRef, handleQueryClick, handleResetClick } = usePageContent()
 // 点击content,modal的操作
 const { modalRef, handleNewClick, handleEditClick } = usePageModal()
+/* department的modal只需要相同的list数据，故只需要导入，无需利用fetchEntireDataAction再次导入Modal选项数据 */
+const systemStore = useSystemStore()
+const { pageList } = storeToRefs(systemStore)
+
 // 对modalConfig进行操作
 const modalConfigRef = computed(() => {
-  const mainStore = useMainStore()
   // 要对需要导入的options数据进行符合el-select的格式的转换
-  const departments = mainStore.entireDepartments.map((item) => {
+  const departments = pageList.value.map((item) => {
     return {
       label: item.name,
       value: item.id
@@ -66,7 +70,3 @@ const modalConfigRef = computed(() => {
   return modalConfig
 })
 </script>
-<style scoped>
-.department {
-}
-</style>

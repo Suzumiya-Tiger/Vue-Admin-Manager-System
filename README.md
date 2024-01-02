@@ -16,8 +16,6 @@
 
 **本项目接口文档:**https://documenter.getpostman.com/view/20140339/2s9Ykt6KK5
 
-**本项目未对用户管理的业务组件进行抽离和封装操作，是为了方便开发者理解/简单使用业务组件来进行开发，其它业务页面均进行了抽离和高度模块化的封装设计，望知悉**
-
 在线演示地址：[vue3_cms](http://139.199.212.233/ "demo演示")
 
 ## 推荐的IDE设置
@@ -566,7 +564,7 @@ export function mapMenusToPermissions(menuList: any[]) {
 **usePermissions.ts**
 
 ```typescript
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 
 export default function usePermissions(permissionID: string) {
   const loginStore = useLoginStore()
@@ -972,7 +970,7 @@ export function mapPathToBreadcrumbs(path: string, userMenus: any[]) {
 <script setup lang="ts">
 import { mapPathToBreadcrumbs } from '@/utils/map-menus'
 import { useRoute } from 'vue-router'
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 import { computed } from 'vue'
 // 获取当前路由
 const route = useRoute()
@@ -1528,8 +1526,6 @@ const option = computed<EChartsOption>(() => {
 
 我们在**dashboard.vue**里面请求对应的数据，并且利用数组的map方法根据echart指定的数据格式进行转换，随后将其装载进对应的图表类型组件即可完成操作：
 
-
-
 ```vue
 <template>
     <-- ...省略前后的若干代码 -->
@@ -1553,8 +1549,6 @@ const showGoodsCategoryCount = computed(() => {
 ```
 
 ---
-
-## 
 
 **Loading组件**
 

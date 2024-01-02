@@ -12,16 +12,16 @@ type EditFnType = (data: any, type: string) => void
 import type PageModal from '@/components/page-modal/page-modal.vue'
 function usePageModal(editCB?: EditFnType) {
   const modalRef = ref<InstanceType<typeof PageModal>>()
-  function handleNewClick() {
+  async function handleNewClick() {
     if (editCB) {
-      editCB(null, 'new')
+      await editCB(null, 'new')
     }
     modalRef.value?.setModalVisible()
   }
-  function handleEditClick(rowData: any) {
+  async function handleEditClick(rowData: any) {
     // 如果存在回调函数，就执行回调函数
     if (editCB) {
-      editCB(rowData, 'edit')
+      await editCB(rowData, 'edit')
     }
     modalRef.value?.setModalVisible(rowData)
   }

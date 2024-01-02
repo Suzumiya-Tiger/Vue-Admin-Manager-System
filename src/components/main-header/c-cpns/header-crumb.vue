@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 import { mapPathToBreadcrumbs } from '@/utils/map-menus'
 import { useRoute } from 'vue-router'
 import { computed } from 'vue'

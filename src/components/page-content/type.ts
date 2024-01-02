@@ -4,6 +4,7 @@ export interface propsListOptions {
   prop?: string
   width?: string
   slotName?: string
+  align?: string
 }
 
 export interface IProps {

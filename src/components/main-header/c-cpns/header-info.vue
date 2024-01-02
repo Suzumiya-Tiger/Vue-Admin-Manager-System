@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 import { localCache } from '@/utils/cache'
 import { useRouter } from 'vue-router'
 import imgUrl from '@/assets/images/avatar.jpg'

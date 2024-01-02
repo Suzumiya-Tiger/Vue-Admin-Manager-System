@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 import { localCache } from '@/utils/cache'
 import { reactive, ref, shallowRef } from 'vue'
 import { ElMessage } from 'element-plus'

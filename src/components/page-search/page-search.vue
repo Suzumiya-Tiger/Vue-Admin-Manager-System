@@ -33,6 +33,7 @@
                   v-model="searchForm[item.prop]"
                   :placeholder="item.placeholder"
                   style="width: 100%"
+                  clearable
                 >
                   <template
                     v-for="itemOption in item.options"
@@ -50,7 +51,6 @@
         </template>
       </el-row>
     </el-form>
-
     <!-- 重置和搜索的按钮 -->
     <div class="btns">
       <el-button icon="Refresh" @click="handleResetClick">重置</el-button>

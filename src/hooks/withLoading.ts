@@ -31,10 +31,6 @@ export const withLoading = (
 ) => {
   let loading: any
   const showLoading = (options: loadingType) => {
-    // 创建一个容器元素并将其附加到 document.body 中
-    const container = document.createElement('div')
-    document.body.appendChild(container)
-    options.target = container
     loading = ElLoading.service(options)
   }
   const hideLoading = () => {
@@ -47,7 +43,7 @@ export const withLoading = (
     try {
       showLoading(_options)
       // ...args是为了将fn原本携带的参数传递下去
-      const result = await fn(...args)
+      const result = fn(...args)
       const isPromise = result instanceof Promise
       if (!isPromise) {
         hideLoading()

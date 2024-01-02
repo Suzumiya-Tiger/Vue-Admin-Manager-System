@@ -1,4 +1,4 @@
-import useLoginStore from '@/store/login/login'
+import useLoginStore from '@/store/login'
 
 export default function usePermissions(permissionID: string) {
   const loginStore = useLoginStore()

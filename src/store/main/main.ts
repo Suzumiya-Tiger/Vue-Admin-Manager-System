@@ -4,21 +4,21 @@ import {
   getEntireRoles
 } from '@/service/modules/main/main'
 import { defineStore } from 'pinia'
+import useSystemStore from '@/store/main/system'
 interface IMainState {
   entireRoles: any[]
   entireDepartments: any[]
   entireMenus: any[]
 }
 const fetchDataMap: Record<string, () => Promise<any>> = {
-  role: async () => {
-    const departmentsResult = await getEntireDepartment()
-    const menuResult = await getEntireMenus()
-    return { departmentsResult, menuResult }
-  },
-  department: async () => {
+  users: async () => {
     const rolesResult = await getEntireRoles()
+    const departmentsResult = await getEntireDepartment()
+    return { rolesResult, departmentsResult }
+  },
+  role: async () => {
     const menuResult = await getEntireMenus()
-    return { rolesResult, menuResult }
+    return { menuResult }
   },
   menus: async () => {
     const rolesResult = await getEntireRoles()
@@ -26,7 +26,6 @@ const fetchDataMap: Record<string, () => Promise<any>> = {
     return { rolesResult, departmentsResult }
   }
 }
-import useSystemStore from '../main/system/system'
 const useMainStore = defineStore('main', {
   state: (): IMainState => ({
     entireRoles: [],

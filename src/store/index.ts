@@ -1,4 +1,4 @@
-import useLoginStore from './login/login'
+import useLoginStore from './login'
 // 在一个总的出口文件之中导出createPinia函数用于创建pinia
 import { createPinia } from 'pinia'
 import type { App } from 'vue'

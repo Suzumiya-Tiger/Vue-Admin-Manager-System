@@ -19,14 +19,15 @@
           :rules="formRules"
         >
           <template v-for="item in modalConfig.formItems" :key="item.prop">
-            <el-form-item :prop="item.prop">
-              <template #label v-if="!item.hidden">
+            <el-form-item v-if="!item.hidden" :prop="item.prop">
+              <template #label>
                 <span>{{ item.label }}</span>
               </template>
               <template #default v-if="item.type === 'input'">
                 <el-input
                   v-model="formData[item.prop]"
                   :placeholder="item.placeholder"
+                  :disable="item.disable ?? false"
                 ></el-input>
               </template>
               <!-- 自定义组件 -->
@@ -45,10 +46,7 @@
                   size="default"
                 />
               </template>
-              <template
-                #default
-                v-else-if="item.type === 'select' && isShow(item)"
-              >
+              <template #default v-else-if="item.type === 'select'">
                 <el-select
                   v-model="formData[item.prop]"
                   :placeholder="item.placeholder"
@@ -72,7 +70,9 @@
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="dialogClose">关闭</el-button>
-          <el-button type="primary" @click="dialogSubmit">提交</el-button>
+          <el-button type="primary" @click="dialogSubmit(modalForm)"
+            >提交</el-button
+          >
         </span>
       </template>
     </el-dialog>
@@ -80,25 +80,22 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, shallowRef } from 'vue'
-import type { IModalProps, formItemType } from './type'
-import useSystemStore from '@/store/main/system/system'
-import { ElForm, ElMessage, type FormRules } from 'element-plus'
-const isShow = computed(() => {
-  return (item: formItemType) => {
-    if (item.prop !== 'sort') {
-      return true
-    } else {
-      return formData.type !== 1
-    }
-  }
-})
+import { reactive, ref, shallowRef } from 'vue'
+import type { IModalProps } from './type'
+import useSystemStore from '@/store/main/system'
+import {
+  ElForm,
+  ElMessage,
+  type FormRules,
+  type FormInstance
+} from 'element-plus'
 
 // 0.定义props
 const props = defineProps<IModalProps>()
 const emit = defineEmits(['create-btn-click', 'edit-btn-click'])
+
 // 获取表单的ref
-const modalForm = ref<InstanceType<typeof ElForm>>()
+const modalForm = ref<FormInstance>()
 
 // 1.定义模态框相关数据
 const dialogVisible = shallowRef(false)
@@ -106,13 +103,13 @@ const dialogVisible = shallowRef(false)
 const formData = reactive({ id: null, type: null })
 
 // 定义form的校验规则
-const formRules: FormRules = {}
+const formRules = reactive<FormRules>({})
 for (const item of props.modalConfig.formItems) {
   // 初始化initialForm的数据
   formData[item.prop] = item.initialValue ?? null
   /* 格式化formRules的数据 */
   item.required
-    ? (formRules[item.label] = [
+    ? (formRules[item.prop] = [
         {
           required: true,
           message: item.placeholder,
@@ -162,50 +159,63 @@ function dialogClose() {
   }
   modalForm.value?.clearValidate()
 }
-async function dialogSubmit() {
-  let infoData = { ...formData }
-  if (props.modalConfig.customFormItemName) {
-    if (Array.isArray(props.modalConfig.propSlotData)) {
-      infoData[props.modalConfig.customFormItemName] = [
-        ...props.modalConfig.propSlotData
-      ]
-    }
+async function dialogSubmit(formEl: FormInstance | undefined) {
+  if (!formEl) {
+    return
   }
-  if (modalType.value === 'create') {
-    // 提交创建结果
-    const res = await systemStore.newPageDataAction(
-      props.modalConfig.pageName,
-      infoData
-    )
-    if (Number(res.code)) {
-      ElMessage.error(res.message)
+  await formEl.validate(async (valid, fields) => {
+    if (!valid) {
+      console.log('error submit!', fields)
       return
     }
-    const useStore = useSystemStore()
-    useStore.changeFirstLoad()
-    ElMessage.success('创建成功')
-    emit('create-btn-click')
-  } else if (modalType.value === 'edit') {
-    /* 针对菜单管理修改的过滤 */
-    if (props.modalConfig.pageName === 'menu') {
-      formData.type = null
+    let infoData = { ...formData }
+    if (props.modalConfig.customFormItemName) {
+      if (Array.isArray(props.modalConfig.propSlotData)) {
+        infoData[props.modalConfig.customFormItemName] = [
+          ...props.modalConfig.propSlotData
+        ]
+      }
     }
-    const res = await systemStore.editPageDataAction(
-      props.modalConfig.pageName,
-      formData.id ?? 0,
-      infoData
-    )
-    if (res.code) {
-      ElMessage.error(res.message || '请求失败')
-      return
+    if (props.modalConfig.customFormItemName) {
+      infoData[props.modalConfig.customFormItemName] =
+        props.modalConfig.propSlotValue
     }
-    const useStore = useSystemStore()
-    useStore.changeFirstLoad()
-    ElMessage.success('修改成功')
-    emit('edit-btn-click')
-  }
-  // 将Modal隐藏并且清空表单
-  dialogClose()
+    if (modalType.value === 'create') {
+      // 提交创建结果
+      const res = await systemStore.newPageDataAction(
+        props.modalConfig.pageName,
+        infoData
+      )
+      if (Number(res.code)) {
+        ElMessage.error(res.message)
+        return
+      }
+      const useStore = useSystemStore()
+      useStore.changeFirstLoad()
+      ElMessage.success('创建成功')
+      emit('create-btn-click')
+    } else if (modalType.value === 'edit') {
+      /* 针对菜单管理修改的过滤 */
+      if (props.modalConfig.pageName === 'menu') {
+        formData.type = null
+      }
+      const res = await systemStore.editPageDataAction(
+        props.modalConfig.pageName,
+        formData.id ?? 0,
+        infoData
+      )
+      if (res.code) {
+        ElMessage.error(res.message || '请求失败')
+        return
+      }
+      const useStore = useSystemStore()
+      useStore.changeFirstLoad()
+      ElMessage.success('修改成功')
+      emit('edit-btn-click')
+    }
+    // 将Modal隐藏并且清空表单
+    dialogClose()
+  })
 }
 
 // 暴露的属性和方法
