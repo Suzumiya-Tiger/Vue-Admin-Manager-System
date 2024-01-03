@@ -104,6 +104,7 @@ const formData = reactive({ id: null, type: null })
 
 // 定义form的校验规则
 const formRules = reactive<FormRules>({})
+console.log(props.modalConfig)
 for (const item of props.modalConfig.formItems) {
   // 初始化initialForm的数据
   formData[item.prop] = item.initialValue ?? null

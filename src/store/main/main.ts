@@ -42,8 +42,6 @@ const useMainStore = defineStore('main', {
         this.entireDepartments = departmentsResult?.data.list || []
         this.entireMenus = menuResult?.data.list || []
       }
-      const useStore = useSystemStore()
-      useStore.changeFirstLoad()
     }
   }
 })

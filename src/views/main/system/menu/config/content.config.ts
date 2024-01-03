@@ -1,8 +1,7 @@
 const contentConfig = {
   pageName: 'menu',
   headers: {
-    title: '菜单列表',
-    btnTitle: '新建菜单'
+    title: '菜单列表'
   },
   propsList: [
     { label: '菜单名称', prop: 'name', width: '180px' },
