@@ -164,9 +164,9 @@ const modalConfigRef = computed(() => {
   modalConfig.formItems.forEach((item) => {
     // 针对select-options组件进行options数据的数据导入
     if (item.prop === 'role_id') {
-      item.options?.push(...roleOptions)
+      item.options = [...roleOptions]
     } else if (item.prop === 'departmentId') {
-      item.options?.push(...departmentOptions)
+      item.options = [...departmentOptions]
     }
   })
   return modalConfig
