@@ -120,7 +120,10 @@ import { withLoading } from '@/hooks/withLoading'
 
 const props = defineProps<IProps>()
 // 定义事件
-const emit = defineEmits(['newBtnClick', 'editBtnClick'])
+const emit = defineEmits<{
+  newBtnClick: []
+  editBtnClick: [rowData: any]
+}>()
 const tableRef = ref<InstanceType<typeof ElTable>>()
 
 // 0.获取是否存在对应的增删改查的权限

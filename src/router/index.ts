@@ -4,6 +4,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { LOGIN_TOKEN } from '@/global/constants'
 import { firstMenu } from '@/utils/map-menus'
 
+import { withLoading } from '@/hooks/withLoading'
 const router = createRouter({
   // 采用hash模式
   history: createWebHashHistory(),
@@ -36,9 +37,14 @@ const router = createRouter({
 // 导航守卫
 // 参数：to(跳转到的位置)/from(从哪里跳转过来)
 // 返回值：决定导航的路径（不返回或者返回undefined，默认跳转）
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const token = localCache.getCache(LOGIN_TOKEN)
 
+  await withLoading(() => Promise.resolve(), {
+    lock: true,
+    text: '正在加载中...',
+    background: 'rgba(122, 122, 122, 0.2)'
+  })()
   if (to.path.startsWith('/main') && !token) {
     // 只有拥有token，才能正常进入main
     return '/login'
