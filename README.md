@@ -24,6 +24,8 @@
 
 # 项目开发向导
 
+**本项目基于pnpm构建，使用前建议执行`npm install pnpm`来安装pnpm管理依赖包。**
+
 ## 代码规范配置(选配，非必须)
 
 ### 1.使用editorConfig统一配置
@@ -95,134 +97,6 @@ module.exports = {
 }
 ```
 
-## git commit规范(选配，非必须)
-
-注意，本章节的操作前提在于您已经建立了git仓库
-
-### eslint自动校验工具
-
-我们希望保证代码仓库中的代码都是符合eslint规范的，所以我们会在**git commit**时进行代码校验，如果不符合eslint规范，借助husky工具，本项目可以支持自动通过规范修复
-
-- **husky是一个git hook工具，可以帮助我们触发git提交的各个阶段：pre-commit、commit-msg、pre-push**
-
-husky配置命令：
-
-```shell
-pnpx husky-init && pnpm install
-```
-
-**该命令执行以下操作：**
-
-1.安装husky相关的依赖：
-
-2.在项目目录下创建 `.husky` 文件夹：
-
-3.在package.json中添加一个脚本：
-
-```shell
-  "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-```
-
-这保证了执行git commit的时候，会自动对代码进行lint校验
-
-具体实现可以查看本项目下的husky，里面会在提交git的时候自动写入 `npm run lint`
-
-### 统一提交规范工具
-
-我们采用了Commitizen进行git提交风格统一工作
-
-什么是Commitizen ？**Commitizen 是一个帮助编写规范 commit message 的工具**
-
-在本项目中的使用方法如下：
-
-1.安装Commitizen
-
-```shell
-pnpm install commitizen -D
-```
-
-2.因为Commitizen是依赖于 **cz-conventional-changelog** 的，所以我们需要额外安装**cz-conventional-changelog**，并且初始化**cz-conventional-changelog**
-
-```shell
-pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
-```
-
-3.在**package.json**中**删除以下配置**：
-
-```shell
- "config": {
-  "commitizen": {
-   "path": "./node_modules/cz-conventional-changelog"
-  }
- }
-```
-
-然后在根目录创建.czrc,写入以下内容：
-
-```
-{
-    "path": "cz-conventional-changelog"
-}
-```
-
-#### 结合commitlint来约束提交格式
-
-我们可以禁止常规的git commit -m 提交，通过强制推进Commitizen来进行规范化的代码提交，所以我们需要以下工具：
-
-1.安装 **@commitlint/config-conventional** 和 **@commitlint/cli**
-
-```shell
-npm i @commitlint/config-conventional @commitlint/cli -D
-```
-
-2.在根目录创建**commitlint.config.js**文件，配置commitlint
-
-```javascript
-module.exports = {
-  extends: ['@commitlint/config-conventional']
-}
-```
-
-同时我们需要ts编译规避掉这份创建的文件，防止编译失败，所以我们需要在 **tsconfig.json**中针对避免编译的配置项进行设置：
-
-**tsconfig.json**
-
-```
-  "exclude": [
-    "commitlint.config.js"
-  ],
-```
-
-3.我们在命令行执行以下命令，从而在husky中生成**commit-msg**文件，该文件用于验证提交信息：
-
-```shell
-npx husky add .husky/commit-msg "npx --no-install commitlint --edit $1"
-```
-
-**commit-msg**
-
-`pnpx --no-install commitlint --edit `用于检查提交的命令格式是否规范，简而言之就是必须通过 `npx cz` 来提交命令。
-
-```
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-pnpx --no-install commitlint --edit
-
-```
-
-#### 简化提交命令
-
-通过上述步骤，我们提交项目至git目录的时候，会使得整体代码符合lint规范，同时又符合git提交命令的规范，使得整个提交过程既优雅又规范。
-
-我们还可以直接在 **package.json**里面将 `npx cz`命令写入执行命令之中，以后我们直接输入cz就可以轻松进行提交代码说明了：
-
-**package.json**
-
-```
-"commit":"cz"
-```
-
 ## 文件架构目录
 
 #### 系统梳理和理解向导
@@ -247,7 +121,7 @@ service网络请求架构=>store下的登录业务相关逻辑处理文件 **log
 
 ### base-ui
 
-引入第三方UI配置(目前暂无，可自定义配置)
+全局应用组件配置(目前暂无，可自定义配置)
 
 ### components
 
@@ -267,7 +141,7 @@ service网络请求架构=>store下的登录业务相关逻辑处理文件 **log
 
 我们需要在这里对Vue进行一个ts编译声明，使TS能够正确识别Vue组件
 
-```
+```ts
 // 声明一个模块，用于给typescript匹配所有以 ".vue" 结尾的文件
 // 使得typeScript可以正确识别vue文件到底是一个什么类型(写明具体的模块类型)
 declare module '*.vue' {

@@ -31,7 +31,7 @@ const modalConfig: IModalConfig = {
       label: '菜单列表',
       prop: 'menuList',
       placeholder: '请选择菜单列表',
-      required: true,
+      required: false,
       initialValue: []
     },
     {
