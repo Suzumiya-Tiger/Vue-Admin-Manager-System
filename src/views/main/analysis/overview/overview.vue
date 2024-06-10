@@ -151,6 +151,7 @@
   p {
     color: #fff;
     padding: 8px 20px;
+    font-size: 16px;
   }
 }
 .main {
