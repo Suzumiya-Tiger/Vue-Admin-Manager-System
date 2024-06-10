@@ -5,9 +5,8 @@
       data-name="dongxiao"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
-      width="627.781"
-      height="652"
       viewBox="0 0 787.781 652"
+      class="my-svg"
     >
       <defs>
         <linearGradient
@@ -1262,6 +1261,10 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.my-svg {
+  position: relative;
+  top: 50px;
+}
 .cls-1,
 .cls-11,
 .cls-12,

@@ -76,7 +76,6 @@ const { pageList } = storeToRefs(useSystemStore())
 这个 data 参数并不是一个响应式引用，
 而是一个普通的 JavaScript 对象，所以你应该直接使用 data 而不是 data.value。 */
 const handleElTreeCheck = (data: menuType) => {
-  console.log(data)
   if (data && data.id) {
     menuValue.value.parentId = data.id
     modalConfig.propSlotValue = data.id

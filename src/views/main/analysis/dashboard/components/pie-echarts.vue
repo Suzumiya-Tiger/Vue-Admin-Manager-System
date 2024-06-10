@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import useEcharts from '@/hooks/useEcharts'
 import type { pieData } from '@/types/powerScreen/pieData'
 import type { Ref } from 'vue'
@@ -23,11 +23,19 @@ let myChart: {
   setOption?: (option: any) => void
   resizeFn?: () => void
 } | null = null
+const resizeHandler = () => {
+  setupEchart(props.pieDatas)
+}
+
 onMounted(() => {
   setupEchart(props.pieDatas)
   if (myChart && myChart.resizeFn) {
     window.addEventListener('resize', myChart.resizeFn)
+    window.addEventListener('resize', resizeHandler)
   }
+})
+onUnmounted(() => {
+  window.removeEventListener('resize', resizeHandler)
 })
 // 监听echartDatas的变化
 watch(
@@ -36,14 +44,33 @@ watch(
     setupEchart(newVal)
   }
 )
+// 创建一个函数，该函数根据窗口宽度返回饼图数据元素的个数
+function getPieDataCountByWindowWidth() {
+  const windowWidth = window.innerWidth
+  let pieDataCount
+  console.log(windowWidth)
+  if (windowWidth < 1900 && windowWidth > 1200) {
+    pieDataCount = 4 // 如果窗口宽度小于600，只显示5个元素
+  } else if (windowWidth < 1200) {
+    pieDataCount = 2 // 如果窗口宽度小于900，显示7个元素
+  }
+  return pieDataCount
+}
+const updateData = (pieDatas: any[]) => {
+  const propDataCount = getPieDataCountByWindowWidth()
+  const newDatas = pieDatas.slice(0, propDataCount)
+  return newDatas
+}
 function setupEchart(pieDatas: pieData) {
   // 防止重复创建节点(在网络请求刷新数据的时候)
   if (!myChart) {
     myChart = useEcharts(divRef)
   }
-  let computedOption = setOption(pieDatas)
+  const filterPieDatas = updateData(pieDatas)
+  let computedOption = setOption(filterPieDatas)
   myChart.echartInstance.setOption(computedOption)
 }
+
 function setOption(pieDatas: pieData) {
   let data = pieDatas.map((item) => {
     return {
@@ -51,6 +78,7 @@ function setOption(pieDatas: pieData) {
       name: item.station_name
     }
   })
+
   /*
     在你的代码中，total 是一个计算属性，
     而 TypeScript 在静态类型检查时，
@@ -66,10 +94,27 @@ function setOption(pieDatas: pieData) {
     color: pieDatas.map((item) => {
       return item.color
     }),
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)'
+    }, // 其他配置项...
+    graphic: {
+      type: 'text',
+      left: 'center',
+      top: 'center',
+      style: {
+        text: `充电桩总数\n${total}`,
+        textAlign: 'center',
+        fill: '#000',
+        width: 30,
+        height: 30,
+        fontSize: 16
+      }
+    },
     title: {
       text: `{nameSty| 充电桩总数}\n{number|${total}}`,
       top: '50%',
-      left: '30%',
+      left: '32%',
       textStyle: {
         rich: {
           nameSty: {
@@ -115,7 +160,7 @@ function setOption(pieDatas: pieData) {
             padding: [10, 14]
           },
           numberSty: {
-            fontSize: 12,
+            fontSize: 14,
             color: '#40E6ff',
             padding: [0, 0, 0, 14]
           },
