@@ -21,8 +21,8 @@ class HYRequest {
   constructor(config: HDSRequestConfig) {
     this.instance = axios.create(config)
 
-    /* 1.每个instance实例都添加全局的拦截器 */
-    // 传递的两个参数分别是成功和失败的回调函数
+    /* 1.每个instance实例都添加关于请求和响应的全局的拦截器 */
+
     this.instance.interceptors.request.use(
       (config) => {
         // 全局请求成功的拦截
@@ -34,7 +34,7 @@ class HYRequest {
         return err
       }
     )
-    // 注意一下，这里的res.data已经不是AxiosResponse类型了，而是我们自己定义的泛型T
+    // 注意一下，这里的res.data已经不是AxiosResponse类型了，res对应的是我们自己定义的泛型T
     this.instance.interceptors.response.use(
       (res) => {
         return res.data
@@ -67,7 +67,7 @@ class HYRequest {
       this.instance
         .request<any, T>(config)
         .then((res) => {
-          // 单词响应的成功拦截处理
+          // 单次响应的成功拦截处理
           if (config.interceptors?.responseSuccessFn) {
             res = config.interceptors.responseSuccessFn(res)
           }

@@ -37,17 +37,16 @@ export function mapMenusToRoutes(userMenus: any[]) {
   for (const menu of userMenus) {
     for (const submenu of menu.children) {
       const route = localRoutes.find((route) => route.path === submenu.url)
-      /* 实现功能：为顶层的菜单(可以理解为一级面包屑)添加重定向功能，定位到
-      实际存在业务页面的二级菜单，但是只需要执行第一次 */
-      // 可能前后端路由因为权限问题无法对齐(后端路由缺失)，所以需要进行判断
+
       if (route) {
-        // 给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
-        // 防止点击父级路由时，页面显示空白
+        // console.log(route, routes, menu)
+
         if (!routes.find((item) => item.path === menu.url)) {
-          // 下文的作用是为了点击一级面包屑时，跳转到二级面包屑的第一个路由
+          /* 实现功能：为路由跳转或顶层菜单栏(可以理解为一级面包屑或者是直接跳转到父路由路径)添加重定向功能，
+          定位到实际存在业务页面的二级菜单，每次遍历不同板块的路由都只为第一个父路由添加一个redirect定向 */
           routes.push({ path: menu.url, redirect: route.path })
         }
-        // 将二级菜单对应的路由添加到路由映射表中
+        // 将二级菜单对应的路由添加到路由映射表中(注意上面添加的是一级菜单路由的映射，这里是正式添加路由)
         routes.push(route)
       }
       // 记录第一个被匹配到的路由映射对象，即从后端获取的路由映射表列表中选取第一个路由映射表

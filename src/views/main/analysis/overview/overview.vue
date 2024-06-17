@@ -45,7 +45,7 @@
                 </p>
                 <p style="font-size: 22px">项目介绍：</p>
                 <p>
-                  ⚡ 本项目基于ROAC(role based access
+                  ⚡ 本项目基于RBAC(role based access
                   control)原则对用户的权限进行约束和控制，路由管理和功能均受登录用户的角色类型进行展示或控制。
                 </p>
                 <p>

@@ -48,7 +48,6 @@ watch(
 function getPieDataCountByWindowWidth() {
   const windowWidth = window.innerWidth
   let pieDataCount
-  console.log(windowWidth)
   if (windowWidth < 1900 && windowWidth > 1200) {
     pieDataCount = 4 // 如果窗口宽度小于600，只显示5个元素
   } else if (windowWidth < 1200) {

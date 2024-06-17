@@ -28,7 +28,7 @@
 
 ### 1.使用editorConfig统一配置
 
-```
+```json
 # http://editorconfig.org
 
 root = true
@@ -48,13 +48,13 @@ trim_trailing_whitespace = false
 
 ### 2.使用prettier工具配置
 
-```
+```json
 pnpm install prettier -D
 ```
 
 在.prettierrc进行配置
 
-```
+```json
 {
  "$schema": "https://json.schemastore.org/prettierrc",
  "semi": false,
@@ -67,7 +67,7 @@ pnpm install prettier -D
 
 ### 3.使用ESLint检测配置
 
-```
+```json
 pnpm install eslint-plugin-prettier eslint-config-prettier -D
 ```
 
@@ -159,7 +159,7 @@ pnpx commitizen init cz-conventional-changelog  --pnpm --save-dev --save-exact
 
 然后在根目录创建.czrc,写入以下内容：
 
-```
+```json
 {
     "path": "cz-conventional-changelog"
 }
@@ -187,7 +187,7 @@ module.exports = {
 
 **tsconfig.json**
 
-```
+```json
   "exclude": [
     "commitlint.config.js"
   ],
@@ -203,7 +203,7 @@ npx husky add .husky/commit-msg "npx --no-install commitlint --edit $1"
 
 `pnpx --no-install commitlint --edit `用于检查提交的命令格式是否规范，简而言之就是必须通过 `npx cz` 来提交命令。
 
-```
+```json
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
@@ -267,7 +267,7 @@ service网络请求架构=>store下的登录业务相关逻辑处理文件 **log
 
 我们需要在这里对Vue进行一个ts编译声明，使TS能够正确识别Vue组件
 
-```
+```json
 // 声明一个模块，用于给typescript匹配所有以 ".vue" 结尾的文件
 // 使得typeScript可以正确识别vue文件到底是一个什么类型(写明具体的模块类型)
 declare module '*.vue' {
@@ -395,7 +395,7 @@ export default registerIcons
 
 在main.ts导入该文件，利用**app.use(icons)**注册即可完成全局注册
 
-# 项目的解析和梳理
+# 项目讲解
 
 ## 登录逻辑
 
@@ -504,7 +504,7 @@ id/name/token
 
 首先展示一下从后端获取的功能/按钮权限数据格式示例，功能/按钮权限写入到菜单路由的 **children**数组之中， 本项目中功能/按钮权限的type统一为3：
 
-```
+```json
 {
     "id": 11,
     "url": null,
@@ -645,7 +645,6 @@ function fetchPageListData(formData: any = {}) {
         // 最终嵌套进去的路由还是本地定义的路由对象，用于vue-router的导航
         router.addRoute('main', route)
       })
-
     }
 ```
 
@@ -660,8 +659,11 @@ function fetchPageListData(formData: any = {}) {
 具体步骤如下：
 
 - 获取后端返回的路由菜单映射表，将其存入**userMenus**
+
 - 从该路由菜单映射表获取所有后端返回的路由对象，存在一个数组之中
+
 - 前端项目中(本项目)，将所有的路由对象一个个存在独立的文件当中
+
 - 举例说明：
 
   ```typescript
@@ -674,6 +676,7 @@ function fetchPageListData(formData: any = {}) {
   }
   
   ```
+  
 - 从文件中先将所有前端写好路由对象先存档到一个数组里面，准备匹配后端返回的路由菜单映射表
 
   我们通过**map-menus**中的工具类函数 **loadLocalRoutes** 来完成前端所有的路由对象的遍历存档，并将遍历处理后的路由对象数组暴露出去
@@ -701,38 +704,9 @@ function fetchPageListData(formData: any = {}) {
     return localRoutes
   }
   ```
-- 根据后端的路由菜单映射表去意义匹配，再通过**router.addRoute('main',匹配路由)**加入到路由表中
-
-  ```typescript
-  // 这里的功能主要分为两个部分：1.根据路由映射表去匹配正确的路由 2.加载面包屑
-  export function mapMenusToRoutes(userMenus: any[]) {
-    // 1.先加载本地的路由
-    const localRoutes = loadLocalRoutes()
-    // 2.根据路由映射表去匹配正确的路由
-    // 先把前端本地路由映射表的路由全部汇总进来，然后再从后端获取的路由映射表进行匹配
-    const routes: RouteRecordRaw[] = []
-    for (const menu of userMenus) {
-      for (const submenu of menu.children) {
-        const route = localRoutes.find((route) => route.path === submenu.url)
-        // 有可能不存在，所以需要判断
-        if (route) {
-          // 给顶层的菜单(可以理解为一级面包屑)添加重定向功能，但是只需要执行第一次即可
-          // 所以需要再添加下文的判断，即只有当routes中不存在menu.url时，才添加重定向功能
-          // 简而言之，就是给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
-          if (!routes.find((item) => item.path === menu.url)) {
-            // 下文的作用是为了点击一级面包屑时，跳转到二级面包屑的第一个路由
-            routes.push({ path: menu.url, redirect: route.path })
-          }
-          // 将二级菜单对应的路由添加到路由映射表中
-          routes.push(route)
-        }
-        // 记录第一个被匹配到的路由映射对象，即从后端获取的路由映射表列表中选取第一个路由映射表
-        if (!firstMenu && route) firstMenu = submenu
-      }
-    }
-    return routes
-  }
-  ```
+  
+  
+  
 - 获取到匹配的路由之后，我们再在**login.ts**之中通过调用 **mapMenusToRoutes** 并传入一个后端返回的映射路由表，完成前后端路由鉴权匹配，并将其正式添加进前端路由router之中：
 
   ```typescript
@@ -742,10 +716,6 @@ function fetchPageListData(formData: any = {}) {
             router.addRoute('main', route)
           })
 
-
-
-  ```
-
 当然请注意，在 **login.ts**里面，要针对已登录和未登录的场景分别进行路由导入处理:
 
 ### 在已登录的情况下应用路由映射表
@@ -754,7 +724,8 @@ function fetchPageListData(formData: any = {}) {
 
 **main.ts**
 
-```typescript
+  ```typescript
+
 // ...忽略前面的代码
 
 // 刷新获取路由映射表(已授权情况下)应该建立在pinia的架构创建之后,所以这里统一封装到store的出口文件之中
@@ -812,7 +783,7 @@ export default registerStore
         // 在已登录的情况下为了获取路由映射表，调用mapMenusToRoutes获取符合权限的路由映射表
         const routes = mapMenusToRoutes(userMenus)
         routes.forEach((route) => {
-          router.addRoute('main', route)
+          router.addRoute(                                                                                                                                             'main', route)
         })
       }
     }
@@ -1006,19 +977,20 @@ export function mapMenusToRoutes(userMenus: any[]) {
   for (const menu of userMenus) {
     for (const submenu of menu.children) {
       const route = localRoutes.find((route) => route.path === submenu.url)
-      /* 实现功能：为顶层的菜单(可以理解为一级面包屑)添加重定向功能，定位到实际存在业务页面的二级菜单，但是只需要执行第一次 */
-      // 可能前后端路由因为权限问题无法对齐(后端路由缺失)，所以需要进行判断
+
       if (route) {
-        // 给routes里面添加一个父路由对象，内面的重定向指向第一个子路由
-        // 防止点击父级路由时，页面显示空白
+        // console.log(route, routes, menu)
+
         if (!routes.find((item) => item.path === menu.url)) {
-          // 下文的作用是为了点击一级面包屑时，跳转到二级面包屑的第一个路由
+          /* 实现功能：为路由跳转或顶层菜单栏(可以理解为一级面包屑或者是直接跳转到父路由路径)添加重定向功能，
+          定位到实际存在业务页面的二级菜单，每次遍历不同板块的路由都只为第一个父路由添加一个redirect定向 */
           routes.push({ path: menu.url, redirect: route.path })
         }
-        // 将二级菜单对应的路由添加到路由映射表中
+        // 将二级菜单对应的路由添加到路由映射表中(注意上面添加的是一级菜单路由的映射，这里是正式添加路由)
         routes.push(route)
       }
-
+      // 记录第一个被匹配到的路由映射对象，即从后端获取的路由映射表列表中选取第一个路由映射表
+      if (!firstMenu && route) firstMenu = submenu
     }
   }
   return routes
@@ -1091,11 +1063,13 @@ export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
 
 我们会在 **HYRequest** 实例里面封装get、post、delete、patch等等通用的请求方法，这些通用方法依赖于**request**函数，它是一个基于axios构建的网络请求实例的进行二次封装的函数
 
-为什么需要封装一个**request**函数？因为我们在依赖第三方库的时候，为了防止第三方库停止维护或者出现安全漏洞时，我们为了修复这个问题不得不在全局进行大量修改。所以我们应该进行二次封装操作，防止后续的大面积更改
+为什么需要封装一个**request**函数？因为我们在依赖第三方库的时候，为了防止第三方库停止维护或者出现安全漏洞时，我们为了修复这个问题不得不在全局进行大量修改。所以我们应该进行二次封装操作，防止后续的大面积更改。
+
+这里我们只是针对instance进行axios类的应用，一旦axios以后无法使用或者切换网络请求库，我们只需要从instance这一层剥离和替换网络请求库即可，无需全局改动。
 
 ### 自定义网络请求的指定拦截器(高粒度)
 
-很多时候我们也许并不需要对某些请求进行拦截，所以我们应该在构造实例的时候，动态地选择是否生成拦截器。所以我们可以进一步去请求实例进行更加高粒度的自定义处理
+很多时候我们也许并不需要对某些请求进行拦截，所以我们应该在构造实例的时候，动态地选择是否生成拦截器。所以我们可以进一步去请求实例进行更加高粒度的自定义处理。
 
 我们通过在**service**的类型声明**type.ts**进行以下操作：
 
@@ -1119,7 +1093,7 @@ export interface HYRequestConfig<T = AxiosResponse> extends AxiosRequestConfig {
 
 ```
 
-注意看，这里的 **interceptors** 是可选属性，为啥要做成可选的？因为我们需要自定义在实际的网络请求中，我们是否需要拦截器
+注意看，这里的 **interceptors** 是可选属性，为啥要做成可选的？因为我们需要自定义在实际的网络请求中，我们是否需要拦截器。
 
 我们可以再对拦截器的类型进行封装和定义，并将其抽取成一个新的接口类型，命名为 **HYInterceptors**，详情见上面的代码片段。
 
@@ -1196,6 +1170,8 @@ class HYRequest {
 ```
 
 `config = config.interceptors.requestSuccessFn(config)` 这段代码所表达的含义就是我们在调用拦截器的请求成功函数时，将config(配置)本身作为函数传递进去，这个**config**会在**requestSuccessFn**函数内部被处理完成后，再次被**return**出来，此时我们再重新定义一个新的**config**来接收经过**requestSuccessFn**函数处理完成后的**config**，即可完成操作。
+
+请注意，requestSuccessFn并不是`axios`的一部分，而是你在`service=>index.ts` 中定义的。`axios`只是提供了一个机制，允许你在请求发送到服务器之前修改请求的配置。这个机制就是请求拦截器。
 
 你可以把这套操作理解为“升级焕新”操作，至于你通过 **new HYRequest** 构造生成的**hyRequest**对象内部使用 **requestSuccessFn** 对**config**做什么操作，你可以自行定义。
 
@@ -1364,7 +1340,7 @@ const locale = ref(zhCn)
 
 而模态框的展示是在当前这一次**Tick**中进入队列准备执行，而在下一次**Tick**中生效，也就是此时模态框的 **DOM**并没有进行渲染操作
 
-所以我们需要在回调函数 **editCallBack**里面定义**nextTick**，使得我们的数据需要在模态框的 **DOM**记载完成后进行正确的写入，才能正常显示回显数据
+所以我们需要在回调函数 **editCallBack**里面定义**nextTick**，使得我们的数据需要在模态框的**DOM**加载完成后进行正确的写入，才能正常显示回显数据
 
 ![image-20231113173742777](./README.assets/image-20231113173742777.png)
 

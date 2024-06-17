@@ -40,18 +40,18 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   const token = localCache.getCache(LOGIN_TOKEN)
 
-  await withLoading(() => Promise.resolve(), {
-    lock: true,
-    text: '正在加载中...',
-    background: 'rgba(122, 122, 122, 0.2)'
-  })()
-  if (to.path.startsWith('/main') && !token) {
-    // 只有拥有token，才能正常进入main
-    return '/login'
-  }
-  // 在前置守卫的连接操作中，针对已登录的情况下，如果登录操作完成时在main页面并且token存在
-  if (to.path === '/main' && token) {
-    return firstMenu?.url
-  }
+  // 使用 withLoading 包装的函数
+  const navigate = withLoading(async () => {
+    if (to.path.startsWith('/main') && !token) {
+      // 只有拥有token，才能正常进入main
+      return '/login'
+    }
+    // 在前置守卫的连接操作中，针对已登录的情况下，如果登录操作完成后跳转指向main父路由页面并且token存在
+    if (to.path === '/main' && token) {
+      return firstMenu?.url
+    }
+  })
+  // 调用 navigate 函数
+  return await navigate()
 })
 export default router
