@@ -39,7 +39,7 @@ import { localCache } from '@/utils/cache'
 import { ref, shallowRef, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
 import { isNavigationFailure } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElLoading, ElMessage } from 'element-plus'
 
 const btnLoading = shallowRef(false)
 const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
@@ -55,6 +55,12 @@ watch(isRemPwd, (newVal) => {
 const accountRef = ref<InstanceType<typeof PaneAccount>>()
 let activeName = 'account'
 async function handleLoginBtnClick() {
+  const loadingInstance = ElLoading.service({
+    text: '正在登录，请稍候...',
+    fullscreen: true,
+    background: 'rgba(0, 0, 0, 0.7)'
+  })
+
   btnLoading.value = true
   try {
     const result = await accountRef.value?.loginAction(isRemPwd.value)
@@ -65,6 +71,7 @@ async function handleLoginBtnClick() {
     ElMessage.error('登录失败，请重试')
   } finally {
     btnLoading.value = false
+    loadingInstance.close() // 关闭全局 loading
   }
 }
 </script>
