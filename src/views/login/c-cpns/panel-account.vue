@@ -80,29 +80,36 @@ function translateShow() {
 // 3.执行帐号的登录逻辑
 // InstanceType<typeof ElForm> 获取实例构造器(typeof ElForm)的实例类型(即返回的实例)
 const formRef = ref<InstanceType<typeof ElForm>>()
-function loginAction(isRemPwd: Boolean) {
-  formRef.value?.validate((valid) => {
-    if (valid) {
-      // 1.获取用户输入的账号和密码
-      const name = account.name
-      const password = account.password
-      // 2.向服务器发送网络请求(携带账号和密码)
-      // 调用其action的内部方法
-      loginStore.loginAccountAction({ name, password }).then(() => {
-        // 3.判断要不要记住密码
-        if (isRemPwd) {
-          localCache.setCache(CACHE_NAME, name)
-          localCache.setCache(CACHE_PASSWORD, password)
-        } else {
-          localCache.removeCache(CACHE_NAME)
-          localCache.removeCache(CACHE_PASSWORD)
-        }
-      })
-    } else {
-      ElMessage.error('请输入正确的格式后再操作')
-    }
+function loginAction(isRemPwd: Boolean): Promise<void> {
+  return new Promise((resolve, reject) => {
+    formRef.value?.validate((valid) => {
+      if (valid) {
+        const name = account.name
+        const password = account.password
+
+        loginStore
+          .loginAccountAction({ name, password })
+          .then(() => {
+            if (isRemPwd) {
+              localCache.setCache(CACHE_NAME, name)
+              localCache.setCache(CACHE_PASSWORD, password)
+            } else {
+              localCache.removeCache(CACHE_NAME)
+              localCache.removeCache(CACHE_PASSWORD)
+            }
+            resolve()
+          })
+          .catch(() => {
+            reject()
+          })
+      } else {
+        ElMessage.error('请输入正确的格式后再操作')
+        reject()
+      }
+    })
   })
 }
+
 // 暴露子组件的方法给父组件使用
 defineExpose({
   loginAction

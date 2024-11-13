@@ -75,7 +75,7 @@ const route = useRoute()
 const defaultActive = computed(() => {
   // 触发computed的关键在于pathMenu的值会根据route.path的变化而变化
   const pathMenu = mapPathToMenu(route.path, userMenus)
-  return pathMenu.id + ''
+  return pathMenu ? pathMenu.id + '' : ''
 })
 </script>
 

@@ -1,5 +1,6 @@
 import { localCache } from '@/utils/cache'
 import { defineStore } from 'pinia'
+
 import {
   accountLoginRequest,
   getUserInfoById,
@@ -39,44 +40,31 @@ const useLoginStore = defineStore('login', {
   }),
   actions: {
     /*  未登录的情况下，登录账号的操作 */
-    async loginAccountAction(account: IAccount) {
+    async loginAccountAction(account: IAccount): Promise<void | undefined> {
       // 1.账号登录，获取token等信息
-      // 网络请求应该在store中进行执行，业务页面直接调用该请求完成store参数的录入即可
       const loginResult = await accountLoginRequest(account)
       const id = loginResult.data.id
       this.token = loginResult.data.token
-      // 以LOGIN_TOKEN的键名存入token
       localCache.setCache(LOGIN_TOKEN, this.token)
 
-      // 2.获取登录用户的详细信息(role信息)
+      // 2.获取用户信息
       const userInfoResult = await getUserInfoById(id)
-      const userInfo = userInfoResult.data
-      this.userInfo = userInfo
-      // 4.根据角色请求用户的权限(路由映射表menus)
-      // 获取路由映射表(userMenus)
-      // 代码写在对应的位置
+      this.userInfo = userInfoResult.data
+
+      // 3.根据角色获取权限菜单
       const userMenusResult = await getUserMenuByRoleId(this.userInfo.role_id)
-      const userMenus = userMenusResult.data
-      this.userMenus = [...userMenus]
+      this.userMenus = [...userMenusResult.data]
+      localCache.setCache(USERINFO, this.userInfo)
+      localCache.setCache(USERMENUS, this.userMenus)
 
-      // 3.进行本地缓存
-      localCache.setCache(USERINFO, userInfo)
-      localCache.setCache(USERMENUS, userMenus)
+      // 4.获取按钮权限并动态注册路由
+      this.permissions = [...mapMenusToPermissions(this.userMenus)]
+      const routes = mapMenusToRoutes(this.userMenus)
+      routes.forEach((route) => router.addRoute('main', route))
 
-      // 4.(重要)获取登录用户的所有按钮的权限
-      const permissionList = mapMenusToPermissions(userMenus)
-      this.permissions = [...permissionList]
-      // 5.(重要)动态地通过路由映射表添加路由
-      // 登录时调用mapMenusToRoutes获取符合权限的路由映射表
-      const routes = mapMenusToRoutes(userMenus)
-      routes.forEach((route) => {
-        // 最终嵌套进去的路由还是本地定义的路由对象，用于vue-router的导航
-        router.addRoute('main', route)
-      })
-      // 6.页面跳转(main页面),后续操作包含了已登录的情况下，跳转至指定的firstMenu路由
+      // 5. 跳转到主页面
       router.push('/main')
     },
-
     /* 默认在已登录的情况下，刷新页面后再次获取符合权限的路由映射表 */
     loadLocalCacheAction() {
       // 用户刷新默认加载数据

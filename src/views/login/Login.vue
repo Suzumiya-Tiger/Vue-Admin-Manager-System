@@ -1,7 +1,7 @@
 <template>
   <div class="login" ref="Area">
     <div class="box-left first-box">
-      <svg id="location" height="400" width="744">
+      <svg id="location" height="400">
         <desc>Created with Snap</desc>
         <defs>
           <linearGradient

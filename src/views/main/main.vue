@@ -9,7 +9,9 @@
           <main-header @fold-change="handleFoldChange" />
         </el-header>
         <el-main>
-          <router-view></router-view>
+          <keep-alive>
+            <router-view></router-view>
+          </keep-alive>
         </el-main>
       </el-container>
     </el-container>
@@ -17,9 +19,13 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef } from 'vue'
-import MainMenu from '@/components/main-menu/main-menu.vue'
-import MainHeader from '@/components/main-header/main-header.vue'
+import { shallowRef, defineAsyncComponent } from 'vue'
+const MainMenu = defineAsyncComponent(
+  () => import('@/components/main-menu/main-menu.vue')
+)
+const MainHeader = defineAsyncComponent(
+  () => import('@/components/main-header/main-header.vue')
+)
 
 // 处理main-header中折叠的变化
 const isFold = shallowRef(false)

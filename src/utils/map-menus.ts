@@ -62,6 +62,8 @@ export function mapMenusToRoutes(userMenus: any[]) {
  * @param userMenus 后端返回的所有的菜单
  */
 export function mapPathToMenu(path: string, userMenus: any[]) {
+  console.log('path', path, 'userMenus', userMenus)
+
   for (const menu of userMenus) {
     for (const submenu of menu.children) {
       // 寻找等于传入path的路由映射
