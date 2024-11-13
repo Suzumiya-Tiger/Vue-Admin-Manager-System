@@ -37,21 +37,20 @@ const router = createRouter({
 // 导航守卫
 // 参数：to(跳转到的位置)/from(从哪里跳转过来)
 // 返回值：决定导航的路径（不返回或者返回undefined，默认跳转）
-router.beforeEach(async (to) => {
+router.beforeEach((to, from) => {
   const token = localCache.getCache(LOGIN_TOKEN)
 
-  await withLoading(() => Promise.resolve(), {
-    lock: true,
-    text: '正在加载中...',
-    background: 'rgba(122, 122, 122, 0.2)'
-  })()
   if (to.path.startsWith('/main') && !token) {
-    // 只有拥有token，才能正常进入main
+    // 如果没有 token，重定向到登录页面
     return '/login'
   }
-  // 在前置守卫的连接操作中，针对已登录的情况下，如果登录操作完成时在main页面并且token存在
-  if (to.path === '/main' && token) {
-    return firstMenu?.url
+  if (to.path === '/main') {
+    return firstMenu?.url || '/main/analysis/overview'
+  }
+  if (to.path === '/login' && token) {
+    // 如果已经有 token，却访问登录页面，重定向到主页面
+    return firstMenu?.url || '/main'
   }
 })
+
 export default router

@@ -38,6 +38,8 @@
 import { localCache } from '@/utils/cache'
 import { ref, shallowRef, watch } from 'vue'
 import PaneAccount from './panel-account.vue'
+import { isNavigationFailure } from 'vue-router'
+import { ElMessage } from 'element-plus'
 
 const btnLoading = shallowRef(false)
 const isRemPwd = ref<boolean>(localCache.getCache('isRemPwd') ?? false)
@@ -52,13 +54,18 @@ watch(isRemPwd, (newVal) => {
 // 通过调用ref可以获取对应的组件实例
 const accountRef = ref<InstanceType<typeof PaneAccount>>()
 let activeName = 'account'
-function handleLoginBtnClick() {
+async function handleLoginBtnClick() {
   btnLoading.value = true
-
-  // 1.获取子组件的实例(defineExpose暴露出来的组件在这里可以结合ref来获取其内部方法/属性)
-  // 这里需要用可选链，因为不能保证后续的函数一定存在
-  accountRef.value?.loginAction(isRemPwd.value)
-  btnLoading.value = false
+  try {
+    const result = await accountRef.value?.loginAction(isRemPwd.value)
+    if (result && isNavigationFailure(result)) {
+      ElMessage.error('跳转失败，请重试')
+    }
+  } catch (error) {
+    ElMessage.error('登录失败，请重试')
+  } finally {
+    btnLoading.value = false
+  }
 }
 </script>
 
