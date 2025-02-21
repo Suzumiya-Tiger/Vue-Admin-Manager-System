@@ -1,5 +1,9 @@
 # Vue3-CMS
 
+## 维护升级中...预计1-2周完成升级
+
+
+
 一个手把手教你如何一步步建立基于Vue3全家桶、Typescript、Echart、Pinia、ElementPlus的后台管理系统
 
 **本文档设有详细的大纲讲解，建议您获取本项目到本地后，使用专用的阅读器打开阅读，使用体验更佳。如果您喜欢本项目，恳请您赏一个star，感激不尽！**
@@ -24,7 +28,7 @@
 
 # 项目开发向导
 
-**本项目基于pnpm构建，使用前建议执行`npm install pnpm`来安装pnpm管理依赖包。**
+**本项目基于pnpm构建，使用前建议执行 `npm install pnpm`来安装pnpm管理依赖包。**
 
 ## 代码规范配置(选配，非必须)
 
@@ -546,7 +550,7 @@ function fetchPageListData(formData: any = {}) {
     component: category,
     children: []
   }
-  
+
   ```
 - 从文件中先将所有前端写好路由对象先存档到一个数组里面，准备匹配后端返回的路由菜单映射表
 
@@ -641,7 +645,7 @@ app.use(store)
 // 在login页面登录的时候，app.use(router)的执行顺序并不重要，因为login页面并没有路由守卫，
 // 也用不上对应的路由映射表，所以不会出现路由守卫失效的情况
 app.use(router)
-  ```
+```
 
 在store的出口文件之中加载本地的数据：
 

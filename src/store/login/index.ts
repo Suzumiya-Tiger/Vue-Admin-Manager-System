@@ -1,37 +1,23 @@
 import { localCache } from '@/utils/cache'
 import { defineStore } from 'pinia'
-
 import {
   accountLoginRequest,
   getUserInfoById,
   getUserMenuByRoleId
 } from '@/service/modules/login/login'
-
 import type { IAccount } from '@/types'
-
 import { mapMenusToRoutes, mapMenusToPermissions } from '@/utils/map-menus'
 import router from '@/router'
-import { LOGIN_TOKEN, USERINFO, USERMENUS } from '@/global/constants'
-// import type { RouteRecordRaw } from 'vue-router'
-// import useMainStore from '../main/main'
+import { LOGIN_TOKEN, USERINFO, USERMENUS, USER_ID } from '@/global/constants'
+
 interface ILoginState {
   token: string
-  // 也可以利用JSON TO TYPESCRIPT网站转换一下数据
-  userInfo: any
-  userMenus: any
+  userInfo: Record<string, any>
+  userMenus: any[]
   permissions: string[]
 }
 
-/* 箭头函数指定类型讲解
-function foo(): number {
-  return 123
-}
-const bar = (): number => {
-  return 123
-}
-*/
 const useLoginStore = defineStore('login', {
-  // 如何指定state的类型
   state: (): ILoginState => ({
     token: '',
     userInfo: {},
@@ -39,54 +25,63 @@ const useLoginStore = defineStore('login', {
     permissions: []
   }),
   actions: {
-    /*  未登录的情况下，登录账号的操作 */
-    async loginAccountAction(account: IAccount): Promise<void | undefined> {
-      // 1.账号登录，获取token等信息
-      const loginResult = await accountLoginRequest(account)
-      const id = loginResult.data.id
-      this.token = loginResult.data.token
-      localCache.setCache(LOGIN_TOKEN, this.token)
-
-      // 2.获取用户信息
-      const userInfoResult = await getUserInfoById(id)
-      this.userInfo = userInfoResult.data
-
-      // 3.根据角色获取权限菜单
-      const userMenusResult = await getUserMenuByRoleId(this.userInfo.role_id)
-      this.userMenus = [...userMenusResult.data]
-      localCache.setCache(USERINFO, this.userInfo)
-      localCache.setCache(USERMENUS, this.userMenus)
-
-      // 4.获取按钮权限并动态注册路由
-      this.permissions = [...mapMenusToPermissions(this.userMenus)]
-      const routes = mapMenusToRoutes(this.userMenus)
-      routes.forEach((route) => router.addRoute('main', route))
-
-      // 5. 跳转到主页面
-      router.push('/main')
-    },
-    /* 默认在已登录的情况下，刷新页面后再次获取符合权限的路由映射表 */
-    loadLocalCacheAction() {
-      // 用户刷新默认加载数据
-      const token = localCache.getCache(LOGIN_TOKEN)
-      const userInfo = localCache.getCache(USERINFO)
-      const userMenus = localCache.getCache(USERMENUS)
-      // 只有token，个人信息，路由映射表都存在时才进行路由路由映射表的数据加载(代表验证登录成功)
-      if (token && userInfo && userMenus) {
+    async loginAccountAction(account: IAccount): Promise<void> {
+      try {
+        // 1.账号登录，获取token等信息
+        const loginResult = await accountLoginRequest(account)
+        const { id, token } = loginResult.data
         this.token = token
-        this.userInfo = userInfo
-        this.userMenus = userMenus
-        // 1.(重要)获取登录用户的所有按钮的权限
-        const permissionList = mapMenusToPermissions(userMenus)
-        this.permissions = [...permissionList]
-        // 2.动态添加路由
-        // 在已登录的情况下为了获取路由映射表，调用mapMenusToRoutes获取符合权限的路由映射表
-        const routes = mapMenusToRoutes(userMenus)
-        routes.forEach((route) => {
-          router.addRoute('main', route)
-        })
+        localCache.setCache(LOGIN_TOKEN, this.token)
+        localCache.setCache(USER_ID, id)
+
+        // 2.获取用户信息
+        const userInfoResult = await getUserInfoById(id)
+        this.userInfo = userInfoResult.data
+        localCache.setCache(USERINFO, this.userInfo)
+
+        // 3.根据角色获取权限菜单
+        const userMenusResult = await getUserMenuByRoleId(this.userInfo.role_id)
+        this.userMenus = [...userMenusResult.data]
+        localCache.setCache(USERMENUS, this.userMenus)
+
+        // 4.获取按钮权限并动态注册路由
+        this.permissions = [...mapMenusToPermissions(this.userMenus)]
+        const routes = mapMenusToRoutes(this.userMenus)
+        routes.forEach((route) => router.addRoute('main', route))
+
+        // 5. 跳转到主页面
+        router.push('/main')
+      } catch (error) {
+        console.error('Login failed:', error)
+        // Handle login error, e.g., show a notification
+      }
+    },
+    async loadLocalCacheAction() {
+      const token = localCache.getCache(LOGIN_TOKEN)
+      const userId = localCache.getCache(USER_ID)
+
+      if (token && userId) {
+        this.token = token
+
+        // 重新获取用户信息
+        const userInfoResult = await getUserInfoById(userId)
+        this.userInfo = userInfoResult.data
+        localCache.setCache(USERINFO, this.userInfo)
+
+        // 获取用户菜单
+        const userMenusResult = await getUserMenuByRoleId(this.userInfo.role_id)
+        this.userMenus = [...userMenusResult.data]
+        localCache.setCache(USERMENUS, this.userMenus)
+
+        // 获取按钮权限并动态注册路由
+        this.permissions = [...mapMenusToPermissions(this.userMenus)]
+        const routes = mapMenusToRoutes(this.userMenus)
+        routes.forEach((route) => router.addRoute('main', route))
+        // 5. 跳转到主页面
+        router.push('/main')
       }
     }
   }
 })
+
 export default useLoginStore

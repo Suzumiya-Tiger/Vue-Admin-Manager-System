@@ -35,6 +35,8 @@ const useMainStore = defineStore('main', {
   actions: {
     async fetchEntireDataAction(pageName: string) {
       const fetchData = fetchDataMap[pageName]
+      console.log('fetchData', fetchData)
+
       if (fetchData) {
         const { rolesResult, departmentsResult, menuResult } = await fetchData()
         // 保存数据
