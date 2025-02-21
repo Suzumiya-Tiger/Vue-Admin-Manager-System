@@ -38,6 +38,15 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()]
     })
   ],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://123.207.58.62:8082', // 你的服务器地址
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
