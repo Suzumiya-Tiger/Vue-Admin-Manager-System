@@ -11,6 +11,13 @@ export interface testReportType {
   year?: string
   pdfUrl?: string
 }
+
+// 添加数字格式化配置接口
+export interface NumberFormatConfig {
+  integerLimit?: number
+  decimalLimit?: number
+}
+
 export interface formItemType {
   id?: any
   type?: string | null
@@ -51,6 +58,10 @@ export interface formItemType {
   rules?: any
   disabled?: boolean
   labelDescription?: string
+  // 新增属性
+  labelWidth?: string // 表单项标签宽度
+  btnLabel?: string // 按钮标签文本
+  numberFormat?: NumberFormatConfig // 数字格式化配置
 }
 
 export interface IModalConfig {

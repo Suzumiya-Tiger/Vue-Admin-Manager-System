@@ -24,10 +24,17 @@
             <!-- 添加 el-row 包裹 -->
 
             <template v-for="item in modalConfig.formItems" :key="item.prop">
-              <el-col :span="item.span || item.span === 0 || 24">
-                <el-form-item v-if="!item.hidden" :prop="item.prop">
+              <el-col
+                v-if="!item.hidden"
+                :span="item.span || item.span === 0 || 24"
+              >
+                <el-form-item
+                  v-if="!item.hidden"
+                  :prop="item.prop"
+                  :label-width="item.labelWidth"
+                >
                   <template #label>
-                    <span>{{ item.label }}</span>
+                    <span>{{ item.btnLabel ?? item.label }}</span>
                   </template>
                   <template
                     #default
@@ -56,7 +63,7 @@
                       v-model.number="localFormData[item.prop]"
                       :placeholder="item.placeholder"
                       style="width: 100%"
-                      @input="formatToTwoDecimalPlaces(item.prop)"
+                      @input="(val: any) => handleNumberInput(val, item)"
                     ></el-input>
                   </template>
 
@@ -94,6 +101,15 @@
                       </template>
                     </el-select>
                   </template>
+                  <template #default v-else-if="item.type === 'checkbox'">
+                    <el-checkbox
+                      v-model="localFormData[item.prop]"
+                      :true-label="'是'"
+                      :false-label="'否'"
+                    >
+                      {{ item.label }}
+                    </el-checkbox>
+                  </template>
                   <template #default v-else-if="item.type === 'cascader'">
                     <el-cascader
                       style="width: 100%"
@@ -130,7 +146,7 @@
                       style="width: 100%"
                     />
                   </template>
-                  <!--                   <template
+                  <template
                     #default
                     v-else-if="item.type === 'upload' && !item.tag"
                   >
@@ -152,7 +168,7 @@
                   </template>
                   <template
                     #default
-                    v-else-if="item.type === 'upload' && item.tag"
+                    v-else-if="item.type === 'upload' && item.tag === 'common'"
                   >
                     <UploadCommon
                       v-model:file-list="localFormData[item.prop]"
@@ -170,7 +186,29 @@
                         }}</el-button>
                       </template>
                     </UploadCommon>
-                  </template> -->
+                  </template>
+                  <template
+                    #default
+                    v-else-if="item.type === 'upload' && item.tag === 'file'"
+                  >
+                    <UploadFile
+                      v-model:file-list="localFormData[item.prop]"
+                      :max-count="item.maxCount || 5"
+                      :allowed-types="item.allowedTypes || ['application/pdf']"
+                      @file-success="
+                          (file:any) => handleUploadSuccess(file, item.prop)
+                        "
+                      @file-remove="
+                          (file:any) => handleFileRemove(file, item.prop)
+                        "
+                    >
+                      <template #trigger>
+                        <el-button size="small" type="primary">{{
+                          item.label
+                        }}</el-button>
+                      </template>
+                    </UploadFile>
+                  </template>
                   <template #default v-else-if="item.type === 'custom'">
                     <slot
                       :name="item.slotName"
@@ -190,52 +228,21 @@
             <el-button @click="dialogClose">关闭</el-button>
 
             <el-button
-              v-if="isSave"
-              type="warning"
-              @click="dialogSubmit(modalForm, '保存')"
-              >保存</el-button
-            >
-            <el-button
               v-if="isSubmit"
               type="primary"
               @click="dialogSubmit(modalForm, '提交')"
               >提交</el-button
             >
           </div>
-          <div
-            class="btn-group"
-            v-else-if="modalType !== 'create' && isOnlyCancel"
-          >
-            <el-button
-              v-if="isCurrentUpdate"
-              type="primary"
-              @click="dialogSubmit(modalForm, currentRowStatus)"
-              >更新</el-button
-            >
+
+          <div class="btn-group" v-else-if="modalType !== 'create'">
             <el-button @click="dialogClose">关闭</el-button>
-          </div>
-          <div
-            class="btn-group"
-            v-else-if="modalType !== 'create' && !isOnlyCancel"
-          >
-            <el-button @click="dialogClose">关闭</el-button>
+
             <el-button
-              v-if="isSave && isCurrentSave"
-              type="warning"
-              @click="dialogSubmit(modalForm, '保存')"
-              >保存</el-button
-            >
-            <el-button
-              v-if="isSubmit && !isCurrentUpdate"
+              v-if="isSubmit"
               type="primary"
               @click="dialogSubmit(modalForm, '提交')"
               >提交</el-button
-            >
-            <el-button
-              v-if="isUpdate && isCurrentUpdate"
-              type="primary"
-              @click="dialogSubmit(modalForm, currentRowStatus)"
-              >更新</el-button
             >
           </div>
         </span>
@@ -245,7 +252,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, shallowRef, watch, onMounted, onUnmounted } from 'vue'
+import {
+  reactive,
+  ref,
+  shallowRef,
+  watch,
+  nextTick,
+  toRaw,
+  computed
+} from 'vue'
 import type { IModalConfig } from './type'
 import useSystemStore from '@/store/main/system'
 import {
@@ -255,16 +270,16 @@ import {
   type FormItemRule
 } from 'element-plus'
 import usePermissions from '@/hooks/usePermissions'
-// import UploadCommon from '../upload-common/UploadCommon.vue'
-
-// const isReadonly = computed(() => modalType.value === 'check')
+import UploadCommon from '../upload-common/UploadCommon.vue'
+import UploadFile from '../upload-file/UploadFile.vue'
+import { debounce } from 'lodash'
 
 // 0.定义props
 interface extraNecessaryInfo {
   key: string
   extraKeyTooltips: string
 }
-// ... existing code ...
+
 const props = withDefaults(
   defineProps<{
     modalConfig: IModalConfig
@@ -272,18 +287,12 @@ const props = withDefaults(
     contentConfig: Record<string, any>
     formData: Record<string, any>
     prevAddress?: string
-    isOnlyCancel?: boolean
-    isCurrentSave?: boolean
-    isCurrentUpdate?: boolean
     extraNecessaryInfo?: extraNecessaryInfo
-    resetSlots: Function
+    resetSlots?: Function
     currentRowStatus?: string
   }>(),
-  {
-    isCurrentSave: true
-  }
+  {}
 )
-// ... existing code ...
 
 const emit = defineEmits<{
   'create-btn-click': []
@@ -292,35 +301,38 @@ const emit = defineEmits<{
   'dialog-opened': []
 }>()
 
-// 获取表单的ref
 const modalForm = ref<FormInstance>()
-const hasMounted = ref(false)
-
-// 1.定义模态框相关数据
 const dialogVisible = shallowRef(false)
-// 定义form的数据
 let localFormData = reactive<Record<string, any>>({})
 const labelWidth = 'auto'
 
+// --- 新增状态 ---
+const isInitializing = ref(false)
+const watchDebounceTimer = ref<number | null>(null)
+
+// --- 更新 watch 逻辑 ---
 watch(
   () => props.formData,
   (newVal) => {
-    if (modalType.value === 'check') {
-      if (hasMounted.value) {
-        Object.assign(localFormData, newVal)
+    if (isInitializing.value) return
 
-        hasMounted.value = false
-      }
+    if (watchDebounceTimer.value) {
+      clearTimeout(watchDebounceTimer.value)
     }
 
-    Object.keys(localFormData).forEach((key) => {
-      const isPropInFormItems = props.modalConfig.formItems.some(
-        (item) => item.prop === key && item.type !== 'custom'
-      )
-      if (!isPropInFormItems) {
-        localFormData[key] = newVal[key]
-      }
-    })
+    watchDebounceTimer.value = window.setTimeout(() => {
+      const customProps = props.modalConfig.formItems
+        .filter((item) => item.type === 'custom')
+        .map((item) => item.prop)
+
+      customProps.forEach((prop) => {
+        if (prop in newVal) {
+          localFormData[prop] = newVal[prop]
+        }
+      })
+
+      watchDebounceTimer.value = null
+    }, 50)
   },
   { deep: true }
 )
@@ -330,28 +342,49 @@ watch(
   (newItems) => {
     newItems.forEach((item) => {
       if (item.hidden && localFormData[item.prop] !== item.initialValue) {
-        // 如果 hidden 为 true，重置对应的值为 initialValue
         localFormData[item.prop] = item.initialValue ?? null
       }
     })
-  }
+  },
+  { deep: true, immediate: true }
 )
 
-// 定义form的校验规则
-const generateNumberRules = (key: keyof typeof localFormData, item: any) => {
+// --- 新增：动态生成验证规则 ---
+const generateNumberRules = (
+  key: keyof typeof localFormData,
+  item: any
+): FormItemRule[] => {
   const rules: FormItemRule[] = []
-  if (item.required) {
+
+  if (item.validator) {
     rules.push({
-      required: true,
-      message: item.placeholder ?? '此字段为必填项',
-      trigger: item.type === 'input' ? 'blur' : 'change'
+      required: item.required ?? false,
+      validator: item.validator,
+      trigger: ['blur', 'change']
     })
+    return rules
   }
 
-  // 如果存在自定义验证器，则添加
-  if (item.validator && item.required) {
+  if (item.required) {
+    const trigger =
+      ['input', 'textarea'].includes(item.type) ||
+      (item.type === 'input' && item.inputType === 'number')
+        ? 'blur'
+        : [
+            'select',
+            'cascader',
+            'date-picker',
+            'radio',
+            'checkbox',
+            'upload'
+          ].includes(item.type)
+        ? 'change'
+        : 'blur'
+
     rules.push({
-      validator: item.validator
+      required: true,
+      message: item.placeholder ?? `请输入${item.label}`,
+      trigger: trigger
     })
   }
 
@@ -384,48 +417,86 @@ const generateNumberRules = (key: keyof typeof localFormData, item: any) => {
   return rules
 }
 
-// 在循环中应用统一生成规则
+// --- 更新：初始化 formRules ---
 const formRules = reactive<Record<string, FormItemRule[]>>({})
-for (const item of props.modalConfig.formItems) {
-  const key = item.prop as keyof typeof localFormData
-  formRules[key] = generateNumberRules(key, item)
-}
-
-// 利用深拷贝将initialForm的值赋值给formData
-// 定义编辑/新增的区分状态
-const modalType = shallowRef('')
-// 获取mainStore中的数据
-// const mainStore = useMainStore()
-// 获取systemStore中的数据
-const systemStore = useSystemStore()
-// 利用pinia的storeToRefs保持取出数据的响应式特性
-// const { entireDepartments } = storeToRefs(mainStore)
-
-// 2.定义设置dialogVisible的方法
-function setModalVisible(rowData: any = {}, type: string) {
-  hasMounted.value = true
-
-  switch (type) {
-    case 'new':
-      modalType.value = 'create'
-      for (const item of props.modalConfig.formItems) {
-        localFormData[item.prop as keyof typeof localFormData] =
-          item.initialValue ?? null
+watch(
+  () => props.modalConfig.formItems,
+  (newItems) => {
+    for (const key in formRules) {
+      delete formRules[key]
+    }
+    for (const item of newItems) {
+      if (!item.hidden) {
+        const key = item.prop as keyof typeof localFormData
+        formRules[key] = generateNumberRules(key, item)
       }
-      break
-    case 'edit':
-      modalType.value = 'edit'
+    }
+  },
+  { deep: true, immediate: true }
+)
 
-      break
-    case 'check':
-      modalType.value = 'check'
-      break
-    default:
-      break
+const modalType = shallowRef('')
+const systemStore = useSystemStore()
+
+// --- 更新 setModalVisible 方法 ---
+function setModalVisible(rowData: any = {}, type: string) {
+  isInitializing.value = true
+  modalType.value = type === 'new' ? 'create' : type
+
+  for (const item of props.modalConfig.formItems) {
+    const key = item.prop as keyof typeof localFormData
+    if (item.type === 'upload') {
+      localFormData[key] = []
+    } else if (Array.isArray(item.initialValue)) {
+      localFormData[key] =
+        item.initialValue.length > 0 ? [...item.initialValue] : []
+    } else if (
+      typeof item.initialValue === 'object' &&
+      item.initialValue !== null
+    ) {
+      localFormData[key] = JSON.parse(JSON.stringify(item.initialValue))
+    } else {
+      localFormData[key] =
+        item.initialValue !== undefined ? item.initialValue : null
+    }
+  }
+
+  if (type === 'edit') {
+    if (Object.keys(rowData).length > 0) {
+      const allProps = props.modalConfig.formItems.map((item) => item.prop)
+      for (const key in rowData) {
+        if (allProps.includes(key)) {
+          nextTick(() => {
+            if (Array.isArray(rowData[key])) {
+              localFormData[key] = [...rowData[key]]
+            } else if (
+              typeof rowData[key] === 'object' &&
+              rowData[key] !== null
+            ) {
+              localFormData[key] = JSON.parse(JSON.stringify(rowData[key]))
+            } else {
+              localFormData[key] = rowData[key]
+            }
+          })
+        }
+      }
+      if (rowData.id !== undefined) {
+        localFormData.id = rowData.id
+      }
+    }
   }
 
   dialogVisible.value = true
+
+  nextTick(() => {
+    modalForm.value?.clearValidate()
+
+    setTimeout(() => {
+      isInitializing.value = false
+    }, 50)
+  })
 }
+
 function handleUploadSuccess(file: any, prop: string) {
   if (!Array.isArray(localFormData[prop])) {
     localFormData[prop] = []
@@ -434,17 +505,8 @@ function handleUploadSuccess(file: any, prop: string) {
   if (!exists) {
     localFormData[prop].push({ name: file.name, url: file.url, uid: file.uid })
   }
-  const item = props.modalConfig.formItems.find((i) => i.prop === prop)
-  if (item) {
-    item.initialValue = []
-  }
 }
-function formatToTwoDecimalPlaces(prop: string) {
-  const value = localFormData[prop]
-  if (typeof value === 'number') {
-    localFormData[prop] = parseFloat(value.toFixed(2))
-  }
-}
+
 function handleFileRemove(file: any, prop: string) {
   if (Array.isArray(localFormData[prop])) {
     localFormData[prop] = localFormData[prop].filter(
@@ -452,6 +514,14 @@ function handleFileRemove(file: any, prop: string) {
     )
   }
 }
+
+function formatToTwoDecimalPlaces(prop: string) {
+  const value = localFormData[prop]
+  if (typeof value === 'number') {
+    localFormData[prop] = parseFloat(value.toFixed(2))
+  }
+}
+
 const handleValueChange = (value: any, prop: string) => {
   if (Array.isArray(value) && value.length > 0) {
     localFormData[prop] = value[value.length - 1]
@@ -459,6 +529,7 @@ const handleValueChange = (value: any, prop: string) => {
     localFormData[prop] = value
   }
 }
+
 function dialogClose() {
   dialogVisible.value = false
 
@@ -468,178 +539,155 @@ function dialogClose() {
 
     // 如果是上传组件，确保清空文件列表
     if (item.type === 'upload') {
-      localFormData[key] = [] // 清空上传文件列表
-    } else if (Array.isArray(localFormData[key])) {
-      localFormData[key] = [] // 清空数组
+      localFormData[key] = []
+    } else if (Array.isArray(item.initialValue)) {
+      localFormData[key] =
+        item.initialValue.length > 0 ? [...item.initialValue] : []
     } else if (
-      typeof localFormData[key] === 'object' &&
-      localFormData[key] !== null
+      typeof item.initialValue === 'object' &&
+      item.initialValue !== null
     ) {
-      localFormData[key] = null
+      localFormData[key] = JSON.parse(JSON.stringify(item.initialValue))
     } else {
-      localFormData[key] = item.initialValue ?? null
+      localFormData[key] =
+        item.initialValue !== undefined ? item.initialValue : null
     }
   }
+  if (localFormData.id !== undefined) {
+    localFormData.id = null
+  }
 
-  // 重置表单校验状态
-  modalForm.value?.resetFields()
-  modalForm.value?.clearValidate()
+  nextTick(() => {
+    modalForm.value?.resetFields()
+    modalForm.value?.clearValidate()
+  })
 
-  // 发出关闭事件
+  if (props.resetSlots && typeof props.resetSlots === 'function') {
+    props.resetSlots()
+  }
+
   emit('dialog-close')
 }
-console.log('props.contentConfig', props.contentConfig)
 
-const isSubmit = usePermissions(
-  `${props.contentConfig.pageName}:${props.contentConfig.middleName}:submit`
+const isSubmit = computed(() =>
+  usePermissions(
+    `${props.contentConfig.pageName}:${props.contentConfig.middleName}:submit`
+  )
 )
-const isSave = usePermissions(
-  `${props.contentConfig.pageName}:${props.contentConfig.middleName}:save`
+
+const isUpdate = computed(() =>
+  usePermissions(
+    `${props.contentConfig.pageName}:${props.contentConfig.middleName}:update`
+  )
 )
-const isUpdate = usePermissions(
-  `${props.contentConfig.pageName}:${props.contentConfig.middleName}:update`
-)
+
 async function dialogSubmit(formEl: FormInstance | undefined, status?: string) {
-  if (!formEl) {
+  if (!formEl) return
+
+  const valid = await formEl.validate().catch(() => false)
+
+  if (!valid) {
+    ElMessage.error('表单校验未通过，请检查输入内容')
     return
   }
-  // 从 modalConfig 中获取需要保留的隐藏字段
+
+  if (
+    props.extraNecessaryInfo &&
+    !localFormData[props.extraNecessaryInfo.key]
+  ) {
+    ElMessage.error(props.extraNecessaryInfo.extraKeyTooltips)
+    return
+  }
+
+  let infoData = { ...toRaw(localFormData) }
+
   const hiddenFields = props.modalConfig.formItems
-    .filter((item) => item.hidden && item.label === '')
+    .filter((item) => item.hidden && !item.label)
     .map((item) => item.prop)
 
   hiddenFields.forEach((field) => {
-    if (!(field in localFormData)) {
-      localFormData[field] = props.formData[field] || ''
+    if (!(field in infoData) && props.formData && field in props.formData) {
+      infoData[field] = props.formData[field]
     }
   })
-  if (props.prevAddress && localFormData?.address) {
-    localFormData.address = props.prevAddress
-  }
-  if (status === '保存') {
-    const infoData = { ...localFormData }
 
-    hiddenFields.forEach((field) => {
-      if (!(field in infoData)) {
-        infoData[field] = props.formData[field] || ''
-      }
-    })
+  try {
+    let res: any = null
+    const pageName = props.modalConfig.pageName
 
     if (modalType.value === 'create') {
-      const res = await systemStore.newPageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (Number(res.code) !== 200) {
-        ElMessage.error(res.message)
+      res = await systemStore.newPageDataAction(pageName, {
+        ...infoData,
+        status
+      })
+      if (Number(res?.code) === 200) {
+        ElMessage.success('创建成功')
+        emit('create-btn-click')
+        dialogClose()
+      } else {
+        ElMessage.error(res?.message || '创建失败')
+      }
+    } else {
+      const id = infoData.id ?? props.resId
+      if (id === undefined || id === null) {
+        ElMessage.error('无法获取记录ID，操作失败')
         return
       }
-      ElMessage.success('保存成功')
-      emit('create-btn-click')
-    } else if (modalType.value === 'edit') {
-      const res = await systemStore.editPageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (res.code !== 200) {
-        ElMessage.error(res.message || '请求失败')
-        return
+      res = await systemStore.editPageDataAction(pageName, id, {
+        ...infoData,
+        status
+      })
+      if (Number(res?.code) === 200) {
+        ElMessage.success('修改成功')
+        emit('edit-btn-click')
+        dialogClose()
+      } else {
+        ElMessage.error(res?.message || '修改失败')
       }
-      ElMessage.success('保存成功')
-      emit('edit-btn-click')
-    } else if (modalType.value === 'check') {
-      const res = await systemStore.savePageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (res.code !== 200) {
-        ElMessage.error(res.message || '请求失败')
-        return
-      }
-      const useStore = useSystemStore()
-      useStore.changeFirstLoad()
-      ElMessage.success('修改成功')
-      emit('edit-btn-click')
     }
-
-    dialogClose()
-    return
+  } catch (error: any) {
+    console.error('Dialog submit error:', error)
+    ElMessage.error(error.message || '操作执行失败')
   }
-
-  await formEl.validate(async (valid, fields) => {
-    if (!valid) {
-      ElMessage.error('表单校验未通过，请检查输入内容')
-      return
-    }
-    if (
-      props.extraNecessaryInfo &&
-      !localFormData[props.extraNecessaryInfo.key]
-    ) {
-      ElMessage.error(props.extraNecessaryInfo.extraKeyTooltips)
-      return
-    }
-    let infoData = { ...localFormData }
-
-    hiddenFields.forEach((field) => {
-      if (!(field in infoData)) {
-        infoData[field] = props.formData[field] || ''
-      }
-    })
-
-    if (props.prevAddress && infoData?.address) {
-      infoData.address = props.prevAddress
-    }
-
-    if (modalType.value === 'create') {
-      const res = await systemStore.newPageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (Number(res.code) !== 200) {
-        ElMessage.error(res.message)
-        return
-      }
-      const useStore = useSystemStore()
-      useStore.changeFirstLoad()
-      ElMessage.success('创建成功')
-      emit('create-btn-click')
-    } else if (modalType.value === 'edit') {
-      /* 针对菜单管理修改的过滤 */
-      if (props.modalConfig.pageName === 'menu') {
-        localFormData.type = null
-      }
-      const res = await systemStore.editPageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (res.code !== 200) {
-        ElMessage.error(res.message || '请求失败')
-        return
-      }
-      const useStore = useSystemStore()
-      useStore.changeFirstLoad()
-      ElMessage.success('修改成功')
-      emit('edit-btn-click')
-    } else if (modalType.value === 'check') {
-      const res = await systemStore.savePageDataAction(
-        props.modalConfig.pageName,
-        { ...infoData, status }
-      )
-      if (res.code !== 200) {
-        ElMessage.error(res.message || '请求失败')
-        return
-      }
-      const useStore = useSystemStore()
-      useStore.changeFirstLoad()
-      ElMessage.success('修改成功')
-      emit('edit-btn-click')
-    }
-    // 将Modal隐藏并且清空表单
-    dialogClose()
-  })
 }
 
-// 暴露的属性和方法
+const handleNumberInput = debounce((val: any, item: any) => {
+  if (val === '' || val === null || val === undefined) return
+
+  const prop = item.prop
+
+  if (item.numberFormat) {
+    const { integerLimit = 2, decimalLimit = 2 } = item.numberFormat
+
+    // 将输入值转为字符串
+    let strValue = val.toString()
+
+    // 检查是否包含小数点
+    if (strValue.includes('.')) {
+      const [intPart, decPart] = strValue.split('.')
+
+      // 限制整数部分位数
+      if (intPart.length > integerLimit) {
+        strValue = intPart.substring(0, integerLimit) + '.' + decPart
+      }
+
+      // 限制小数部分位数
+      if (decPart.length > decimalLimit) {
+        strValue = intPart + '.' + decPart.substring(0, decimalLimit)
+      }
+
+      localFormData[prop] = parseFloat(strValue)
+    } else {
+      // 如果没有小数点，只限制整数部分
+      if (strValue.length > integerLimit) {
+        localFormData[prop] = parseFloat(strValue.substring(0, integerLimit))
+      }
+    }
+  } else {
+    formatToTwoDecimalPlaces(prop)
+  }
+}, 300)
+
 defineExpose({ setModalVisible })
 </script>
 
@@ -647,18 +695,25 @@ defineExpose({ setModalVisible })
 .form {
   padding: 10px 30px;
   :global(.el-form-item) {
-    padding: 0; /* 移除 padding，防止影响宽度 */
+    padding: 0;
+    margin-bottom: 18px;
   }
 
   .el-form-item {
     padding: 10px 20px;
     padding-right: 0;
   }
-  :global(.el-dialog__footer) {
-    display: flex;
-    justify-content: flex-end;
-    padding-bottom: 20px;
-    padding-right: 20px;
+
+  .dialog-footer {
+    text-align: right;
+    padding: 10px 20px;
+    border-top: 1px solid #ebeef5;
+    .btn-group {
+      display: inline-block;
+      .el-button + .el-button {
+        margin-left: 10px;
+      }
+    }
   }
 }
 </style>

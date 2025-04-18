@@ -12,6 +12,7 @@ import {
   ElementPlusResolve
 } from 'vite-plugin-style-import'
 export default defineConfig({
+  base: '/',
   plugins: [
     createStyleImportPlugin({
       resolves: [ElementPlusResolve()],

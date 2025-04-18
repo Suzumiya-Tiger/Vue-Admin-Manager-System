@@ -47,6 +47,7 @@ import useLoginStore from '@/store/login'
 import { useRouter, useRoute } from 'vue-router'
 import { computed } from 'vue'
 import { mapPathToMenu } from '@/utils/map-menus'
+
 // 0 接收props
 defineProps({
   isFold: {
@@ -63,6 +64,8 @@ const router = useRouter()
 // 2.监听item的点击
 function handleItemClick(item: any) {
   // 从后端获取的路由url必须和前端定义的url一一对应
+  console.log('url', item)
+
   const url = item.url
   router.push(url)
 }

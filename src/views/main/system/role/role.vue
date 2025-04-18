@@ -46,7 +46,7 @@ import { nextTick, ref, computed, reactive } from 'vue'
 import PageSearch from '@/components/page-search/page-search.vue'
 import PageContent from '@/components/page-content/page-content.vue'
 import PageModal from '@/components/page-modal/page-modal.vue'
-import { ElTreeSelect } from 'element-plus'
+import { ElTreeSelect, ElMessage } from 'element-plus'
 
 import searchConfig from './config/search.config'
 import getContentConfig from './config/content.config'
@@ -118,7 +118,7 @@ const handleCheckClick = async (itemData: any) => {
     formData.menuList = [...menuIds]
     modalConfig.propSlotData = [...menuIds]
   })
-  modalRef.value?.setModalVisible(formData, 'check')
+  modalRef.value?.setModalVisible(formData, 'edit')
 }
 
 // 处理树形选择变化
@@ -148,11 +148,11 @@ const handleModalUpdate = async (data: any) => {
     )
   }
 
-  if (result.code === 200) {
+  if (result && result.code === 200) {
     ElMessage.success(type === 'edit' ? '修改成功' : '创建成功')
     handleQueryClick()
   } else {
-    ElMessage.error(result.message || '操作失败')
+    ElMessage.error(result?.message || '操作失败')
   }
 }
 
