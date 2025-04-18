@@ -16,7 +16,7 @@ if (import.meta.env.PROD) {
   BASE_URL = 'http://139.199.212.233:8082'
 } else {
   // 开发环境
-  BASE_URL = 'http://139.199.212.233:8082'
+  BASE_URL = '/'
 }
 
 // 3.通过创建.env(dotenv)文件来直接创建变量
