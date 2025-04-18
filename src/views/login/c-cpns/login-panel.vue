@@ -64,10 +64,12 @@ async function handleLoginBtnClick() {
   btnLoading.value = true
   try {
     const result = await accountRef.value?.loginAction(isRemPwd.value)
+    console.log('result', result)
     if (result && isNavigationFailure(result)) {
       ElMessage.error('跳转失败，请重试')
     }
   } catch (error) {
+    console.log('error', error)
     ElMessage.error('登录失败，请重试')
   } finally {
     btnLoading.value = false

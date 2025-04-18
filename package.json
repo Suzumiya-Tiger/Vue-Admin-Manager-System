@@ -11,8 +11,7 @@
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
-    "prepare": "husky install",
-    "commit": "cz"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
@@ -55,10 +54,5 @@
     "vite": "^4.1.4",
     "vite-plugin-style-import": "^2.0.0",
     "vue-tsc": "^1.2.0"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
   }
 }

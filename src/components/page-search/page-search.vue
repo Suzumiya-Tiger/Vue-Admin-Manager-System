@@ -9,13 +9,29 @@
     >
       <el-row :gutter="20">
         <template v-for="item in searchConfig.formItems" :key="item.prop">
-          <el-col :span="item.span">
-            <el-form-item :label="item.label" :prop="item.prop">
+          <el-col v-if="!item.hidden" :span="item.span">
+            <el-form-item
+              :label="item.label"
+              :prop="item.prop"
+              :label-width="item.labelWidth"
+              v-if="!item.hidden"
+            >
               <template v-if="item.type === 'input'">
                 <el-input
                   v-model="searchForm[item.prop]"
                   :placeholder="item.placeholder"
                 ></el-input>
+              </template>
+              <template v-else-if="item.type === 'cascader'">
+                <el-cascader
+                  v-model="searchForm[item.prop]"
+                  :options="item.options"
+                  :placeholder="item.placeholder"
+                  :props="item.props || {}"
+                  clearable
+                  popper-class="fixed-cascader-dropdown"
+                  @change="(value: any) => handleValueChange(value, item.prop)"
+                />
               </template>
               <template v-else-if="item.type === 'date-picker'">
                 <el-date-picker
@@ -53,7 +69,14 @@
     </el-form>
     <!-- 重置和搜索的按钮 -->
     <div class="btns">
-      <el-button icon="Refresh" @click="handleResetClick">重置</el-button>
+      <slot name="extra-buttons"></slot>
+
+      <el-button
+        v-if="searchConfig.formItems.length"
+        icon="Refresh"
+        @click="handleResetClick"
+        >重置</el-button
+      >
       <el-button type="primary" icon="Search" @click="handleQueryClick"
         >查询</el-button
       >
@@ -62,7 +85,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import type { ElForm } from 'element-plus'
 import usePermissions from '@/hooks/usePermissions'
 
@@ -74,6 +97,8 @@ interface IProps {
     pageName: string
     formItems: any[]
     labelWidth?: string
+    middleName?: string
+    hidden?: boolean
   }
 }
 const emit = defineEmits(['queryClick', 'resetClick'])
@@ -98,11 +123,32 @@ function handleResetClick() {
 }
 function handleQueryClick() {
   // 在这里执行已注册的发射事件
-  emit('queryClick', searchForm)
+  emit('queryClick', toRaw(searchForm))
+}
+const handleValueChange = (value: any, prop: string) => {
+  searchForm[prop] = value
 }
 </script>
 
 <style lang="less" scoped>
+.fixed-cascader-dropdown {
+  position: fixed !important;
+  margin-top: 5px !important;
+  // 可以根据需要调整最大高度
+  max-height: 300px !important;
+}
+
+// 优化下拉面板的滚动行为
+.fixed-cascader-dropdown .el-cascader-panel {
+  max-height: 300px !important;
+  overflow: auto !important;
+}
+
+// 确保每个面板列表的高度一致
+.fixed-cascader-dropdown .el-cascader-menu {
+  height: 300px !important;
+  max-height: 300px !important;
+}
 .search {
   background-color: #fff;
   padding: 20px;

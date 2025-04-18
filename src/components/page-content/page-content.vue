@@ -1,7 +1,6 @@
 <template>
   <div class="content">
     <div class="header">
-      <h3 class="title">{{ contentConfig.headers?.title ?? '数据列表' }}</h3>
       <el-button
         v-if="isCreate && contentConfig.headers?.btnTitle"
         type="primary"
@@ -9,6 +8,7 @@
       >
         {{ contentConfig.headers.btnTitle }}
       </el-button>
+      <slot name="header-buttons"></slot>
     </div>
     <div class="table">
       <el-table
@@ -34,11 +34,18 @@
               </template>
             </el-table-column>
           </template>
+          <template v-else-if="item.type === 'index'">
+            <el-table-column :label="item.label" type="index" width="80">
+              <template #default="scope">
+                {{ (currentPage - 1) * pageSize + scope.$index + 1 }}
+              </template>
+            </el-table-column>
+          </template>
           <template v-else-if="item.type === 'handler'">
             <el-table-column :label="item.label" :width="item.width">
               <template #default="scope">
                 <el-button
-                  v-if="isUpdate"
+                  v-if="isUpdate && !hiddenCheck"
                   size="small"
                   text
                   icon="Edit"
@@ -48,6 +55,7 @@
                 >
                   编辑
                 </el-button>
+                <slot name="custom-handler" v-bind="scope" />
                 <el-popconfirm
                   width="220"
                   confirm-button-text="确认"
@@ -117,14 +125,18 @@ import usePermissions from '@/hooks/usePermissions'
 import { withLoading } from '@/hooks/withLoading'
 import useMainStore from '@/store/main/main'
 import type { ISystemState } from '@/store/main/system/type'
+
 const props = defineProps<{
   contentConfig: Record<string, any>
+  hiddenCheck?: boolean
 }>()
 
 const emit = defineEmits<{
   newBtnClick: []
   checkBtnClick: [rowData: any]
 }>()
+
+const hiddenCheck = props.hiddenCheck ?? false
 
 const tableRef = ref<InstanceType<typeof ElTable>>()
 
@@ -223,6 +235,7 @@ async function handleEditClick(rowData: any) {
     emit('checkBtnClick', rowData)
   })
 }
+
 function handleSizeChange(val: number) {
   pageSize.value = val
   fetchPageListData()
@@ -246,13 +259,8 @@ defineExpose({ fetchPageListData })
     display: flex;
     height: 45px;
     padding: 0 5px;
-    justify-content: space-between;
     align-items: center;
-
-    .title {
-      font-size: 20px;
-      font-weight: 700;
-    }
+    gap: 10px;
 
     .handler {
       align-items: center;
